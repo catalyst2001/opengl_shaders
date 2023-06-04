@@ -3,8 +3,13 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="..\common\shader.c" />
+    <ClCompile Include="..\common\glad\glad.c" />
+    <ClCompile Include="strutl.c" />
+    <ClCompile Include="..\common\memfile.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\shader.h" />
+    <ClInclude Include="strutl.h" />
+    <ClInclude Include="..\common\memfile.h" />
   </ItemGroup>
 </Project>
