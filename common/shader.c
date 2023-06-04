@@ -64,7 +64,7 @@ SHADER_PROG_STATUS gl_shader_prog_create_program(shader_program_t *p_dst, char *
 			goto __error_cleanup;
 		}
 
-		if (!gl_shader_source_compile(&p_dst->vert_shader, p_dsterr, dstlen, shader_type, p_shaders_infos[i].p_shader_source)) {
+		if (!gl_shader_source_compile(&p_dst->shaders[i], p_dsterr, dstlen, shader_type, p_shaders_infos[i].p_shader_source)) {
 			status = SHADER_PROG_STATUS_COMPILATION_ERROR;
 			goto __error_cleanup;
 		}
