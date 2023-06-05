@@ -6,10 +6,15 @@
     <ClCompile Include="..\common\glad\glad.c" />
     <ClCompile Include="strutl.c" />
     <ClCompile Include="..\common\memfile.c" />
+    <ClCompile Include="..\common\window_win32.c" />
+    <ClCompile Include="..\common\window_x11.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\shader.h" />
     <ClInclude Include="strutl.h" />
     <ClInclude Include="..\common\memfile.h" />
+    <ClInclude Include="..\common\window_win32.h" />
+    <ClInclude Include="..\common\window_x11.h" />
+    <ClInclude Include="..\common\window.h" />
   </ItemGroup>
 </Project>
