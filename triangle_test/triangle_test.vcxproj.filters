@@ -7,14 +7,17 @@
     <ClCompile Include="strutl.c" />
     <ClCompile Include="..\common\memfile.c" />
     <ClCompile Include="..\common\window_win32.c" />
-    <ClCompile Include="..\common\window_x11.c" />
+    <ClCompile Include="..\common\r_log.c" />
+    <ClCompile Include="..\common\r_gl_errors.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\shader.h" />
     <ClInclude Include="strutl.h" />
     <ClInclude Include="..\common\memfile.h" />
     <ClInclude Include="..\common\window_win32.h" />
-    <ClInclude Include="..\common\window_x11.h" />
     <ClInclude Include="..\common\window.h" />
+    <ClInclude Include="..\common\r_status.h" />
+    <ClInclude Include="..\common\r_log.h" />
+    <ClInclude Include="..\common\r_gl_errors.h" />
   </ItemGroup>
 </Project>

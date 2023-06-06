@@ -23,7 +23,7 @@
     <ProjectGuid>{11D84B40-745B-4D7C-B4C5-AEEE6CF8BC2F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>triangletest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
     </ClCompile>
@@ -105,7 +105,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
     </ClCompile>
@@ -123,7 +123,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
     </ClCompile>
@@ -143,7 +143,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
     </ClCompile>
@@ -157,18 +157,21 @@
   <ItemGroup>
     <ClCompile Include="..\common\glad\glad.c" />
     <ClCompile Include="..\common\memfile.c" />
+    <ClCompile Include="..\common\r_gl_errors.c" />
+    <ClCompile Include="..\common\r_log.c" />
     <ClCompile Include="..\common\shader.c" />
     <ClCompile Include="..\common\window_win32.c" />
-    <ClCompile Include="..\common\window_x11.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="strutl.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\memfile.h" />
+    <ClInclude Include="..\common\r_gl_errors.h" />
+    <ClInclude Include="..\common\r_log.h" />
+    <ClInclude Include="..\common\r_status.h" />
     <ClInclude Include="..\common\shader.h" />
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="..\common\window_win32.h" />
-    <ClInclude Include="..\common\window_x11.h" />
     <ClInclude Include="strutl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,6 +5,8 @@
  
 */
 #pragma once
+#include <stdbool.h>
+#include "r_status.h"
 
 #define RW_DEFAULT_TITLE "React Game Engine Scene Window"
 #define RW_DEFAULT_WCLASS "RGE060623"
@@ -12,6 +14,8 @@
 typedef struct r_window_s {
 	void *ptr;
 } r_window_t;
+
+#define TO_WINDOW_HANDLE(ptr) (*((r_window_t *)ptr))
 
 typedef enum WINDOW_CHANGE_MODE_FLAGS_ {
 	CHANGE_MODE_FLAG_FULLSCREEN = (1 << 0),
@@ -29,8 +33,8 @@ typedef enum WINDOW_MODES_ {
 /* default window parameters */
 #define RW_DEFAULT_WIDTH             (640)
 #define RW_DEFAULT_HEIGHT            (480)
-#define RW_DEFAULT_COLOR_BUFFER_BITS (24)
-#define RW_DEFAULT_DEPTH_BUFFER_BITS (32)
+#define RW_DEFAULT_COLOR_BUFFER_BITS (32)
+#define RW_DEFAULT_DEPTH_BUFFER_BITS (24)
 #define RW_DEFAULT_MODE              (WINDOW_MODE_FULLSCREEN)
 
 /* GL context requires */
@@ -41,11 +45,19 @@ typedef enum WINDOW_MODES_ {
 typedef struct r_window_init_data_s {
 	const char *p_wclass;
 	const char *p_title;
-	long x;
-	long y;
 	long width;
 	long height;
 	long color_bits;
 	long depth_bits;
 	WINDOW_MODES wmode;
 } r_window_init_data_t;
+
+typedef struct r_window_info_s {
+	char title[64];
+	int colorbits;
+	int depthbits;
+	int posx;
+	int posy;
+	int width;
+	int height;
+} r_window_info_t;
