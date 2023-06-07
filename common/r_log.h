@@ -2,13 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-typedef void (*log_verbose_routine)(const char *p_message, RLOG_MESSAGE_TYPE type);
 
-typedef struct r_log_s {
-	FILE *fp;
-	RLOG_FILTER filter;
-	log_verbose_routine p_routine;
-} r_log_t;
 
 typedef enum RLOG_FILTER_ {
 	RLOG_FILTER_NOTIFIES = (1 << 0),
@@ -17,7 +11,7 @@ typedef enum RLOG_FILTER_ {
 	RLOG_FILTER_CRITICALS = (1 << 3),
 	RLOG_FILTER_VERBOSE = (1 << 4),
 	RLOG_FILTER_FLUSH_TO_FILE = (1 << 5),
-	RLOG_FILTER_ALL = (RLOG_FILTER_NOTIFIES|RLOG_FILTER_WARNINGS|RLOG_FILTER_ERRORS|RLOG_FILTER_CRITICALS|RLOG_FILTER_VERBOSE|RLOG_FILTER_FLUSH_TO_FILE)
+	RLOG_FILTER_ALL = (RLOG_FILTER_NOTIFIES | RLOG_FILTER_WARNINGS | RLOG_FILTER_ERRORS | RLOG_FILTER_CRITICALS | RLOG_FILTER_VERBOSE | RLOG_FILTER_FLUSH_TO_FILE)
 } RLOG_FILTER;
 
 typedef enum RLOG_MESSAGE_TYPE_ {
@@ -27,6 +21,14 @@ typedef enum RLOG_MESSAGE_TYPE_ {
 	RLOG_MESSAGE_ERROR,
 	RLOG_MESSAGE_CRITICAL
 } RLOG_MESSAGE_TYPE;
+
+typedef void (*log_verbose_routine)(const char *p_message, RLOG_MESSAGE_TYPE type);
+
+typedef struct r_log_s {
+	FILE *fp;
+	RLOG_FILTER filter;
+	log_verbose_routine p_routine;
+} r_log_t;
 
 bool r_log_open(r_log_t *p_dst, log_verbose_routine p_verb_routine, RLOG_FILTER filter, const char *p_filename);
 void r_log_puts(const r_log_t *p_src, RLOG_MESSAGE_TYPE msgtype, const char *p_str);

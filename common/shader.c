@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "r_gl_errors.h"
 
 #include "shader.h"
 
@@ -12,7 +13,7 @@ GLuint gl_shader_type_to_gl_const(SHADER_TYPE shader_type)
 	return shader_types[shader_type];
 }
 
-bool gl_shader_source_compile(GLuint *p_dstshader, char *p_dsterr, size_t dstlen, GLenum shader_type, shader_info_t *p_shader_info)
+bool gl_shader_source_compile_object(GLuint *p_dstshader, char *p_dsterr, size_t dstlen, GLenum shader_type, shader_info_t *p_shader_info)
 {
 	GLenum error;
 	GLsizei log_length;
@@ -25,7 +26,7 @@ bool gl_shader_source_compile(GLuint *p_dstshader, char *p_dsterr, size_t dstlen
 	}
 
 	/* set source and compile shader */
-	glShaderSource(shader, 1, &p_shader_info->p_shader_source, NULL);
+	GL_CALL(glShaderSource(shader, 1, &p_shader_info->p_shader_source, NULL));
 	glCompileShader(shader);
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 	if (compile_status != GL_TRUE) {
@@ -45,38 +46,38 @@ bool gl_shader_source_compile(GLuint *p_dstshader, char *p_dsterr, size_t dstlen
 	return true;
 }
 
-SHADER_PROG_STATUS gl_shader_prog_create_program(shader_program_t *p_dst, char *p_dsterr, size_t dstlen,
-	uint32_t flags, const shader_info_t *p_shaders_infos, uint32_t shaders_count)
+bool gl_shader_delete_object(GLuint shader_object)
+{
+	return false;
+}
+
+SHADER_PROG_STATUS gl_shader_prog_create_program(shader_program_t *p_dst_prog, char *p_dsterr, size_t dstlen, uint32_t flags, uint32_t *p_shaders, uint32_t shaders_count)
 {
 	uint32_t i;
+	GLint program_status;
 	SHADER_PROG_STATUS status = SHADER_PROG_STATUS_OK;
 
-	p_dst->flags = SHADER_FLAG_NONE;
-	for (i = 0; i < SHADER_CNT(p_dst->shaders); i++)
-		p_dst->shaders[i] = GL_NONE;
+	/* create shader program and attach shaders */
+	p_dst_prog->num_shaders = shaders_count;
+	p_dst_prog->program = glCreateProgram();
+	for (size_t i = 0; i < p_dst_prog->num_shaders; i++)
+		glAttachShader(p_dst_prog->program, p_shaders[i]);
 
-	/* compile shaders */
-	for (i = 0; i < shaders_count; i++) {
-		p_dst->flags |= (1 << i);
-		GLenum shader_type = gl_shader_type_to_gl_const(p_shaders_infos[i].type);
-		if (shader_type == GL_NONE) {
-			status = SHADER_PROG_STATUS_INVALID_SHADER_TYPE;
-			goto __error_cleanup;
-		}
-
-		if (!gl_shader_source_compile(&p_dst->shaders[i], p_dsterr, dstlen, shader_type, p_shaders_infos[i].p_shader_source)) {
-			status = SHADER_PROG_STATUS_COMPILATION_ERROR;
-			goto __error_cleanup;
-		}
+	glLinkProgram(p_dst_prog->program);
+	glGetProgramiv(p_dst_prog->program, GL_LINK_STATUS, &program_status);
+	if (GL_TRUE != program_status) {
+		status = SHADER_PROG_STATUS_LINKING_ERROR;
+		goto __error_cleanup;
 	}
 
-	/* create shader program */
-	p_dst->program = glCreateProgram();
-	for (size_t i = 0; i < SHADER_CNT(p_dst->shaders); i++)
-		if(p_dst->shaders[i] != GL_NONE)
-			glAttachShader(p_dst->program, p_dst->vert_shader);
-
-	glLinkProgram(p_dst->program);
+	/* validate shader program */
+	glValidateProgram(p_dst_prog->program);
+	glGetProgramiv(p_dst_prog->program, GL_VALIDATE_STATUS, &program_status);
+	if (GL_TRUE != program_status) {
+		glGetProgramInfoLog(p_dst_prog->program, dstlen, NULL, p_dsterr);
+		status = SHADER_PROG_STATUS_VALIDATE_ERROR;
+		goto __error_cleanup;
+	}
 
 	/* finish OK! */
 	return SHADER_PROG_STATUS_OK;

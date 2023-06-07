@@ -4,20 +4,53 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="..\common\shader.c" />
     <ClCompile Include="..\common\glad\glad.c" />
-    <ClCompile Include="strutl.c" />
     <ClCompile Include="..\common\memfile.c" />
-    <ClCompile Include="..\common\window_win32.c" />
-    <ClCompile Include="..\common\r_log.c" />
     <ClCompile Include="..\common\r_gl_errors.c" />
+    <ClCompile Include="..\common\r_log.c">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\r_system.c">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\r_system_win32.c">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="strutl.c">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\window_win32.c">
+      <Filter>engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\shader.h" />
-    <ClInclude Include="strutl.h" />
     <ClInclude Include="..\common\memfile.h" />
-    <ClInclude Include="..\common\window_win32.h" />
-    <ClInclude Include="..\common\window.h" />
-    <ClInclude Include="..\common\r_status.h" />
-    <ClInclude Include="..\common\r_log.h" />
     <ClInclude Include="..\common\r_gl_errors.h" />
+    <ClInclude Include="..\common\r_keys.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_log.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_status.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_system.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\window.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="strutl.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\window_win32.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="engine">
+      <UniqueIdentifier>{5c88d261-58c0-492d-8c7d-e9289a698615}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
