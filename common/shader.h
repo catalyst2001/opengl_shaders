@@ -58,10 +58,9 @@ typedef struct shader_info_s {
 	uint32_t num_attribs;
 } shader_info_t;
 
-bool               gl_shader_source_compile_object(GLuint *p_dstshader, char *p_dsterr, size_t dstlen, GLenum shader_type, shader_info_t *p_shader_info);
+bool               gl_shader_source_compile_object(uint32_t *p_dstshader, char *p_dsterr, size_t dstlen, GLenum shader_type, const char *p_shadersource);
 bool               gl_shader_delete_object(GLuint shader_object);
 SHADER_PROG_STATUS gl_shader_prog_create_program(shader_program_t *p_dst_prog, char *p_dsterr, size_t dstlen, uint32_t flags, uint32_t *p_shaders, uint32_t shaders_count);
-
 SHADER_PROG_STATUS gl_shader_prog_delete_program(shader_program_t *p_src_prog);
 void               gl_shader_prog_use_program(shader_program_t *p_src_prog);
 int32_t            gl_shader_prog_get_uniform_location(int32_t *p_dst_uniform_idx, shader_program_t *p_src_prog, const char *p_uniform_name);

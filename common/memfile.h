@@ -6,7 +6,7 @@
 
 typedef struct memfile_s {
 	size_t size;
-	uint8_t data[];
+	uint8_t data[0];
 } memfile_t;
 
 typedef enum MEMFILE_STATUS_ {

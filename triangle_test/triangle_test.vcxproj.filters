@@ -1,11 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.c" />
-    <ClCompile Include="..\common\shader.c" />
     <ClCompile Include="..\common\glad\glad.c" />
-    <ClCompile Include="..\common\memfile.c" />
-    <ClCompile Include="..\common\r_gl_errors.c" />
     <ClCompile Include="..\common\r_log.c">
       <Filter>engine</Filter>
     </ClCompile>
@@ -21,6 +17,10 @@
     <ClCompile Include="..\common\window_win32.c">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\shader.cpp" />
+    <ClCompile Include="..\common\r_gl_errors.cpp" />
+    <ClCompile Include="..\common\memfile.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\shader.h" />
@@ -47,6 +47,8 @@
     <ClInclude Include="..\common\window_win32.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\r_typedefs.h" />
+    <ClInclude Include="..\common\glad\glad.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="engine">

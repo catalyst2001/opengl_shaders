@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="gui\r_gui_base.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\r_gui_draw.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\r_gui_frame.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\r_gui_image_utils.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\r_gui_memory.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\glad\glad.c">
+      <Filter>glad</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\r_gui_root_dispatcher.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer.cpp" />
+    <ClCompile Include="..\common\shader.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\r_gl_errors.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_debug_message.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="gui">
+      <UniqueIdentifier>{bc613483-63bc-409e-a220-4e6b652d1eb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glad">
+      <UniqueIdentifier>{e67562e3-9dfe-4275-b791-3a23577b31c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stb">
+      <UniqueIdentifier>{2e3b8bac-66fd-4535-8121-399975c87a0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render">
+      <UniqueIdentifier>{5831370c-c131-410b-be2e-7c40122b2c6a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="gui\r_gui_base.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_draw.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_frame.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_image_utils.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_memory.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_rect.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\glad\glad.h">
+      <Filter>glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\stb\stb_image.h">
+      <Filter>stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\stb\stb_truetype.h">
+      <Filter>stb</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_igui_draw.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_colors.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\r_gui_root_dispatcher.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer.h" />
+    <ClInclude Include="..\common\shader.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\r_gl_errors.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="gl_debug_message.h">
+      <Filter>render</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

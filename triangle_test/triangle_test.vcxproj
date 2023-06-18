@@ -23,7 +23,7 @@
     <ProjectGuid>{11D84B40-745B-4D7C-B4C5-AEEE6CF8BC2F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>triangletest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -92,6 +92,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE;WINDOWS_PLATFORM</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -109,6 +110,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE;WINDOWS_PLATFORM</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +130,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE;WINDOWS_PLATFORM</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,6 +152,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_GL_RENDERER_DEBUG_MODE;WINDOWS_PLATFORM</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../common/glad</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,23 +164,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\glad\glad.c" />
-    <ClCompile Include="..\common\memfile.c" />
-    <ClCompile Include="..\common\r_gl_errors.c" />
+    <ClCompile Include="..\common\memfile.cpp" />
+    <ClCompile Include="..\common\r_gl_errors.cpp" />
     <ClCompile Include="..\common\r_log.c" />
     <ClCompile Include="..\common\r_system.c" />
     <ClCompile Include="..\common\r_system_win32.c" />
-    <ClCompile Include="..\common\shader.c" />
+    <ClCompile Include="..\common\shader.cpp" />
     <ClCompile Include="..\common\window_win32.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="strutl.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\glad\glad.h" />
     <ClInclude Include="..\common\memfile.h" />
     <ClInclude Include="..\common\r_gl_errors.h" />
     <ClInclude Include="..\common\r_keys.h" />
     <ClInclude Include="..\common\r_log.h" />
     <ClInclude Include="..\common\r_status.h" />
     <ClInclude Include="..\common\r_system.h" />
+    <ClInclude Include="..\common\r_typedefs.h" />
     <ClInclude Include="..\common\shader.h" />
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="..\common\window_win32.h" />
