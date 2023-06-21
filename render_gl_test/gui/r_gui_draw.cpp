@@ -135,33 +135,12 @@ r_uv_rect *r_gui_draw::skin_get_uv_rect_from_idx(rgui_skin_idx group_idx)
 	return nullptr;
 }
 
-bool r_gui_draw_list::is_different_materials()
-{
-	return last_texture != current_texture;
-}
-
 void r_gui_draw_list::push_current_drawcmd()
 {
-	current_drawcmd.texture = last_texture;
-	current_drawcmd.count_verts = (GLuint)index_buffer.size() - current_drawcmd.start_idx;
-	commands_buffer.push_back(current_drawcmd);
-	current_drawcmd.reset();
-	flags &= ~DRAWCMD_INITIALIZED;
-}
-
-void r_gui_draw_list::commit_drawcmd()
-{
-	if (!(flags & DRAWCMD_INITIALIZED)) {
-		current_drawcmd.start_idx = (GLuint)index_buffer.size();
-		flags |= DRAWCMD_INITIALIZED;
-		return;
-	}
-
-	if (is_different_materials()) {
-		push_current_drawcmd();
-		current_drawcmd.start_idx = (GLuint)index_buffer.size();
-		flags |= DRAWCMD_INITIALIZED;
-	}
+	draw_command.texture = drawing_texture;
+	draw_command.count_verts = (GLuint)index_buffer.size() - draw_command.start_idx;
+	if(draw_command.count_verts)
+		commands_buffer.push_back(draw_command);
 }
 
 r_gui_draw_list::r_gui_draw_list(size_t verts_reserve, size_t cmds_reserve)
@@ -172,6 +151,8 @@ r_gui_draw_list::r_gui_draw_list(size_t verts_reserve, size_t cmds_reserve)
 
 	if(cmds_reserve)
 		commands_buffer.reserve(cmds_reserve);
+
+	draw_command.reset();
 }
 
 r_gui_draw_list::~r_gui_draw_list()
@@ -216,21 +197,28 @@ void r_gui_draw_list::shutdown()
 	glDeleteBuffers(DRAW_LIST_BUFFER_COUNT, buffers);
 }
 
-void r_gui_draw_list::set_init_texture(GLuint texid)
-{
-	last_texture = texid;
-	current_texture = texid;
-}
-
 void r_gui_draw_list::set_texture(GLuint texid)
 {
-	last_texture = current_texture;
 	current_texture = texid;
+
+	// set first texture
+	if (drawing_texture == TEXTURE_NOT_SET) {
+		drawing_texture = current_texture;
+		return;
+	}
+
+	// changing texture, save old draw command and init new
+	if (drawing_texture != current_texture) {
+
+		push_current_drawcmd(); // push previous primitive draw command
+
+		draw_command.reset();
+		draw_command.start_idx = (GLuint)index_buffer.size();
+	}
 }
 
 void r_gui_draw_list::push_rect(const r_gui_vertex *p_verts)
 {
-	commit_drawcmd();
 	uint32_t index = (uint32_t)index_buffer.size();
 	vertex_buffer.push_back(p_verts[0]);
 	vertex_buffer.push_back(p_verts[1]);
@@ -249,7 +237,6 @@ void r_gui_draw_list::push_rect(const r_gui_vertex *p_verts)
 
 void r_gui_draw_list::push_triangle(const r_gui_vertex *p_verts)
 {
-	commit_drawcmd();
 	uint32_t index = (uint32_t)index_buffer.size();
 	vertex_buffer.push_back(p_verts[0]);
 	vertex_buffer.push_back(p_verts[1]);
@@ -268,16 +255,52 @@ void r_gui_draw_list::clear()
 	commands_buffer.clear();
 }
 
+#define GUI_DEBUG
+
 void r_gui_draw_list::commit()
 {
 	GLint vbo_size, ibo_size;
 	GLint previous_vbo, previous_ibo;
 
+#ifdef GUI_DEBUG
+	size_t i;
+
+	/* print verts */
+	for (i = 0; i < vertex_buffer.size(); i++) {
+		r_gui_vertex &vert = vertex_buffer[i];
+		RGUI_DRAW_DBGPRINT("%d  vert( %f %f ) uv( %f %f ) color( %f %f %f %f )", i,
+			vert.vertex.x, vert.vertex.y,
+			vert.texcoord.u, vert.texcoord.v,
+			vert.color.r, vert.color.g, vert.color.b, vert.color.a);
+	}
+
+	/* print indices */
+	for (i = 0; i < index_buffer.size(); i++)
+		RGUI_DRAW_DBGPRINT("%d  index(%d)", index_buffer[i]);
+
+	/* triangles */
+	//for (i = 0; i < index_buffer.size(); i += 3) {
+	//	uint32_t i0 = index_buffer[i + 0];
+	//	uint32_t i1 = index_buffer[i + 1];
+	//	uint32_t i2 = index_buffer[i + 2];
+	//	r_fpt &v0 = vertex_buffer[i0].vertex;
+	//	r_fpt &v1 = vertex_buffer[i1].vertex;
+	//	r_fpt &v2 = vertex_buffer[i2].vertex;
+	//	RGUI_DRAW_DBGPRINT("%d  triangle( {%f %f}, {%f %f}, {%f, %f} )", v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
+	//}
+
+	for (i = 0; i < index_buffer.size(); i++) {
+		r_fpt &v0 = vertex_buffer[index_buffer[i]].vertex;
+		RGUI_DRAW_DBGPRINT("%d  vt(%f %f)", v0.x, v0.y);
+	}
+
+#endif
+
 	/* store old bindings */
 	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &previous_vbo);
 	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &previous_ibo);
 
-	push_current_drawcmd(); // save current drawcmd
+	push_current_drawcmd(); // save unfinished end drawcmd
 
 	/* bind GUI VBO/IBO */
 	vbo_size = 0;
@@ -296,6 +319,7 @@ void r_gui_draw_list::commit()
 	if (ibo_size < (GLint)index_buffer.size()) {
 		GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)(index_buffer.size() * sizeof(uint32_t)), index_buffer.data(), GL_DYNAMIC_DRAW));
 		RGUI_DRAW_DBGPRINT("glBufferData(GL_ELEMENT_ARRAY_BUFFER) allocated %zd bytes", index_buffer.size() * sizeof(uint32_t));
+		total_indices_count = index_buffer.size();
 	}
 
 	/* restore old bindings */
@@ -317,7 +341,8 @@ void r_gui_draw_list::draw()
 			previous_texture = drawcmd.texture;
 		}
 
-		GLuint end_index = drawcmd.start_idx + drawcmd.count_verts;
-		glDrawRangeElements(GL_TRIANGLES, drawcmd.start_idx, end_index, drawcmd.count_verts, GL_UNSIGNED_INT, NULL);
+		//GLuint end_index = drawcmd.start_idx + drawcmd.count_verts;
+		//glDrawRangeElements(GL_TRIANGLES, drawcmd.start_idx, end_index, total_indices_count, GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_TRIANGLES, total_indices_count, GL_UNSIGNED_INT, NULL);
 	}
 }

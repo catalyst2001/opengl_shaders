@@ -60,6 +60,7 @@ public:
 	static r_uv_rect *skin_get_uv_rect_from_idx(rgui_skin_idx group_idx);
 };
 
+#define TEXTURE_NOT_SET 0
 #define DRAWCMD_INITIALIZED (1 << 0)
 
 class r_gui_draw_list
@@ -73,17 +74,16 @@ protected:
 
 private:
 	int flags;
-	r_gui_draw_cmd current_drawcmd;
-	GLuint current_texture;
-	GLuint last_texture;
+	r_gui_draw_cmd draw_command;
+	GLuint drawing_texture; /* current used for drawcmd texture */
+	GLuint current_texture; /* result call of set_texture function */
+	size_t total_indices_count;
 	std::vector<uint32_t> index_buffer;
 	std::vector<r_gui_vertex> vertex_buffer;
 	std::vector<r_gui_draw_cmd> commands_buffer;
 	GLuint buffers[DRAW_LIST_BUFFER_COUNT];
 
-	bool   is_different_materials();
 	void   push_current_drawcmd();
-	void   commit_drawcmd();
 
 //protected:
 public:
@@ -99,11 +99,9 @@ public:
 	bool   init();
 	void   shutdown();
 
-	void   set_init_texture(GLuint texid);
 	void   set_texture(GLuint texid);
 	void   push_rect(const r_gui_vertex *p_verts);
 	void   push_triangle(const r_gui_vertex *p_verts);
-	void   finalize_drawcmd();
 
 	void   clear();
 	void   commit();

@@ -237,7 +237,15 @@ int main()
 		return 1;
 	}
 	glfwMakeContextCurrent(p_window);
-	//glfwSwapInterval(60);
+
+	// Turn on vertical screen sync under Windows.
+	// (I.e. it uses the WGL_EXT_swap_control extension)
+	typedef BOOL(WINAPI *PFNWGLSWAPINTERVALEXTPROC)(int interval);
+	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = NULL;
+	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)glfwGetProcAddress("wglSwapIntervalEXT");
+	if (wglSwapIntervalEXT)
+		wglSwapIntervalEXT(1);
+
 	gladLoadGL();
 
 	GL_CALL(glGenVertexArrays(VAO_COUNT, vertex_array_objects));
@@ -245,7 +253,7 @@ int main()
 	drawlist.init();
 	drawlist.clear();
 
-	drawlist.set_init_texture(1);
+	drawlist.set_texture(1);
 	r_gui_vertex verts[] = {
 		{{0, 0}, {0, 0}, {255, 0, 0}},
 		{{100, 0}, {0, 0}, {0, 255, 0}},
@@ -256,10 +264,10 @@ int main()
 
 	drawlist.set_texture(2);
 	r_gui_vertex verts2[] = {
-		{{100 + 0, 100 + 0}, {0, 0}, {255, 0, 0}},
-		{{100 + 0, 100 + 100}, {0, 0}, {0, 255, 0}},
-		{{100 + 100, 100 + 0}, {0, 0}, {0, 0, 255}},
-		{{100 + 100, 100 + 100}, {0, 0}, {255, 255, 0}},
+		{{100+0, 100 + 0}, {0, 0}, {255, 0, 0}},
+		{{100+100, 100 + 0}, {0, 0}, {0, 255, 0}},
+		{{100+100, 100 + 100}, {0, 0}, {0, 0, 255}},
+		{{100+0, 100 + 100}, {0, 0}, {255, 255, 0}},
 	};
 	drawlist.push_rect(verts2);
 	drawlist.commit();
