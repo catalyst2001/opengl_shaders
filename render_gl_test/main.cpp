@@ -262,7 +262,7 @@ int main()
 	};
 	drawlist.push_rect(verts);
 
-	drawlist.set_texture(2);
+	//drawlist.set_texture(2);
 	r_gui_vertex verts2[] = {
 		{{100+0, 100 + 0}, {0, 0}, {255, 0, 0}},
 		{{100+100, 100 + 0}, {0, 0}, {0, 255, 0}},
@@ -271,6 +271,12 @@ int main()
 	};
 	drawlist.push_rect(verts2);
 	drawlist.commit();
+
+	r_gui_draw_list::drawcmd_info info;
+	drawlist.query_drawcmd_info(info);
+
+	info.get_verts_data_offset();
+
 
 	view = glm::mat4x4(1.f);
 

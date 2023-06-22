@@ -74,6 +74,7 @@ protected:
 
 private:
 	int flags;
+	uint32_t start_vertex;
 	r_gui_draw_cmd draw_command;
 	GLuint drawing_texture; /* current used for drawcmd texture */
 	GLuint current_texture; /* result call of set_texture function */
@@ -88,6 +89,30 @@ private:
 //protected:
 public:
 
+	/* DRAWCMD INFO */
+	class drawcmd_info {
+		friend class r_gui_draw_list;
+		uint32_t verts_start;
+		uint32_t num_verts;
+		uint32_t indices_start;
+		uint32_t num_indices;
+	public:
+		drawcmd_info() : verts_start(0), num_verts(0), indices_start(0), num_indices(0) {}
+		~drawcmd_info() {}
+
+		/* SELECTORS */
+		uint32_t get_verts_start_index() { return verts_start;  }
+		uint32_t get_index_start_index() { return indices_start; }
+		uint32_t get_num_verts() { return num_verts; }
+		uint32_t get_num_indices() { return num_indices; }
+
+		/* HELPERS */
+		uint32_t get_verts_data_offset() { return get_verts_start_index() * sizeof(r_gui_vertex); }
+		uint32_t get_indices_data_offset() { return get_index_start_index() * sizeof(GLuint); }
+		uint32_t get_verts_data_size() { return get_num_verts() * sizeof(r_gui_vertex); }
+		uint32_t get_indices_data_size() { return get_num_indices() * sizeof(GLuint); }
+	};
+
 	r_gui_draw_list(size_t verts_reserve = RGUI_DRAW_RESERVED_VERTICES, size_t cmds_reserve = RGUI_DRAW_RESERVED_COMMANDS);
 	~r_gui_draw_list();
 
@@ -99,9 +124,20 @@ public:
 	bool   init();
 	void   shutdown();
 
+	void   update_fixed(r_gui_vertex *p_verts, uint32_t *p_indices,
+		uint32_t verts_offset, uint32_t verts_num,
+		uint32_t indices_offset, uint32_t indices_num);
+
+	void   update_fixed_by_info(r_gui_vertex *p_verts, uint32_t *p_indices, drawcmd_info &info) {
+		update_fixed(p_verts, p_indices,
+			info.get_verts_data_offset(), info.get_num_verts(),
+			info.get_indices_data_offset(), info.get_num_indices());
+	}
+
 	void   set_texture(GLuint texid);
 	void   push_rect(const r_gui_vertex *p_verts);
 	void   push_triangle(const r_gui_vertex *p_verts);
+	void   query_drawcmd_info(drawcmd_info &info);
 
 	void   clear();
 	void   commit();

@@ -152,6 +152,7 @@ r_gui_draw_list::r_gui_draw_list(size_t verts_reserve, size_t cmds_reserve)
 	if(cmds_reserve)
 		commands_buffer.reserve(cmds_reserve);
 
+	start_vertex = 0;
 	draw_command.reset();
 }
 
@@ -197,6 +198,10 @@ void r_gui_draw_list::shutdown()
 	glDeleteBuffers(DRAW_LIST_BUFFER_COUNT, buffers);
 }
 
+void r_gui_draw_list::update_fixed(r_gui_vertex *p_verts, uint32_t *p_indices, uint32_t verts_offset, uint32_t verts_num, uint32_t indices_offset, uint32_t indices_num)
+{
+}
+
 void r_gui_draw_list::set_texture(GLuint texid)
 {
 	current_texture = texid;
@@ -209,11 +214,17 @@ void r_gui_draw_list::set_texture(GLuint texid)
 
 	// changing texture, save old draw command and init new
 	if (drawing_texture != current_texture) {
-
 		push_current_drawcmd(); // push previous primitive draw command
+<<<<<<< HEAD
+		draw_command.reset(); // reset values in draw command
+		draw_command.start_idx = (GLuint)index_buffer.size(); // save start index in index buffer
+		start_vertex = (uint32_t)vertex_buffer.size(); // save start vertex for new draw command
+		drawing_texture = current_texture; // replace drawing texture to current
+=======
 
 		draw_command.reset();
 		draw_command.start_idx = (GLuint)index_buffer.size();
+>>>>>>> parent of 0ca0d1f (indices error fixed)
 	}
 }
 
@@ -248,6 +259,14 @@ void r_gui_draw_list::push_triangle(const r_gui_vertex *p_verts)
 	RGUI_DRAW_DBGPRINT("%zd verts  %zd indices", vertex_buffer.size(), index_buffer.size());
 }
 
+void r_gui_draw_list::query_drawcmd_info(drawcmd_info &info)
+{
+	info.verts_start = start_vertex;
+	info.num_verts = (uint32_t)vertex_buffer.size() - start_vertex;
+	info.indices_start = draw_command.start_idx;
+	info.num_indices = draw_command.count_verts;
+}
+
 void r_gui_draw_list::clear()
 {
 	vertex_buffer.clear();
@@ -255,7 +274,7 @@ void r_gui_draw_list::clear()
 	commands_buffer.clear();
 }
 
-#define GUI_DEBUG
+//#define GUI_DEBUG
 
 void r_gui_draw_list::commit()
 {
@@ -279,6 +298,16 @@ void r_gui_draw_list::commit()
 		RGUI_DRAW_DBGPRINT("%d  index(%d)", index_buffer[i]);
 
 	/* triangles */
+<<<<<<< HEAD
+	for (i = 0; i < index_buffer.size(); i += 3) {
+		uint32_t i0 = index_buffer[i + 0];
+		uint32_t i1 = index_buffer[i + 1];
+		uint32_t i2 = index_buffer[i + 2];
+		r_fpt &v0 = vertex_buffer[i0].vertex;
+		r_fpt &v1 = vertex_buffer[i1].vertex;
+		r_fpt &v2 = vertex_buffer[i2].vertex;
+		RGUI_DRAW_DBGPRINT("%d  triangle( {%f %f}, {%f %f}, {%f, %f} )", v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
+=======
 	//for (i = 0; i < index_buffer.size(); i += 3) {
 	//	uint32_t i0 = index_buffer[i + 0];
 	//	uint32_t i1 = index_buffer[i + 1];
@@ -292,7 +321,13 @@ void r_gui_draw_list::commit()
 	for (i = 0; i < index_buffer.size(); i++) {
 		r_fpt &v0 = vertex_buffer[index_buffer[i]].vertex;
 		RGUI_DRAW_DBGPRINT("%d  vt(%f %f)", v0.x, v0.y);
+>>>>>>> parent of 0ca0d1f (indices error fixed)
 	}
+
+	//for (i = 0; i < index_buffer.size(); i++) {
+	//	r_fpt &v0 = vertex_buffer[index_buffer[i]].vertex;
+	//	RGUI_DRAW_DBGPRINT("%d  vt(%f %f)", i, v0.x, v0.y);
+	//}
 
 #endif
 
@@ -340,9 +375,6 @@ void r_gui_draw_list::draw()
 			glBindTexture(GL_TEXTURE_2D, drawcmd.texture);
 			previous_texture = drawcmd.texture;
 		}
-
-		//GLuint end_index = drawcmd.start_idx + drawcmd.count_verts;
-		//glDrawRangeElements(GL_TRIANGLES, drawcmd.start_idx, end_index, total_indices_count, GL_UNSIGNED_INT, NULL);
-		glDrawElements(GL_TRIANGLES, total_indices_count, GL_UNSIGNED_INT, NULL);
+		glDrawElements(GL_TRIANGLES, drawcmd.count_verts, GL_UNSIGNED_INT, (void *)(drawcmd.start_idx * sizeof(GLuint)));
 	}
 }
