@@ -1,2 +1,6 @@
 
 *.ilk
+*.db
+*.ipch
+*.obj
+*.tlog

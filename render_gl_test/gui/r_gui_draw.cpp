@@ -215,22 +215,16 @@ void r_gui_draw_list::set_texture(GLuint texid)
 	// changing texture, save old draw command and init new
 	if (drawing_texture != current_texture) {
 		push_current_drawcmd(); // push previous primitive draw command
-<<<<<<< HEAD
 		draw_command.reset(); // reset values in draw command
 		draw_command.start_idx = (GLuint)index_buffer.size(); // save start index in index buffer
 		start_vertex = (uint32_t)vertex_buffer.size(); // save start vertex for new draw command
 		drawing_texture = current_texture; // replace drawing texture to current
-=======
-
-		draw_command.reset();
-		draw_command.start_idx = (GLuint)index_buffer.size();
->>>>>>> parent of 0ca0d1f (indices error fixed)
 	}
 }
 
 void r_gui_draw_list::push_rect(const r_gui_vertex *p_verts)
 {
-	uint32_t index = (uint32_t)index_buffer.size();
+	uint32_t index = (uint32_t)vertex_buffer.size();
 	vertex_buffer.push_back(p_verts[0]);
 	vertex_buffer.push_back(p_verts[1]);
 	vertex_buffer.push_back(p_verts[2]);
@@ -248,7 +242,7 @@ void r_gui_draw_list::push_rect(const r_gui_vertex *p_verts)
 
 void r_gui_draw_list::push_triangle(const r_gui_vertex *p_verts)
 {
-	uint32_t index = (uint32_t)index_buffer.size();
+	uint32_t index = (uint32_t)vertex_buffer.size();
 	vertex_buffer.push_back(p_verts[0]);
 	vertex_buffer.push_back(p_verts[1]);
 	vertex_buffer.push_back(p_verts[2]);
@@ -298,7 +292,6 @@ void r_gui_draw_list::commit()
 		RGUI_DRAW_DBGPRINT("%d  index(%d)", index_buffer[i]);
 
 	/* triangles */
-<<<<<<< HEAD
 	for (i = 0; i < index_buffer.size(); i += 3) {
 		uint32_t i0 = index_buffer[i + 0];
 		uint32_t i1 = index_buffer[i + 1];
@@ -307,21 +300,6 @@ void r_gui_draw_list::commit()
 		r_fpt &v1 = vertex_buffer[i1].vertex;
 		r_fpt &v2 = vertex_buffer[i2].vertex;
 		RGUI_DRAW_DBGPRINT("%d  triangle( {%f %f}, {%f %f}, {%f, %f} )", v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
-=======
-	//for (i = 0; i < index_buffer.size(); i += 3) {
-	//	uint32_t i0 = index_buffer[i + 0];
-	//	uint32_t i1 = index_buffer[i + 1];
-	//	uint32_t i2 = index_buffer[i + 2];
-	//	r_fpt &v0 = vertex_buffer[i0].vertex;
-	//	r_fpt &v1 = vertex_buffer[i1].vertex;
-	//	r_fpt &v2 = vertex_buffer[i2].vertex;
-	//	RGUI_DRAW_DBGPRINT("%d  triangle( {%f %f}, {%f %f}, {%f, %f} )", v0.x, v0.y, v1.x, v1.y, v2.x, v2.y);
-	//}
-
-	for (i = 0; i < index_buffer.size(); i++) {
-		r_fpt &v0 = vertex_buffer[index_buffer[i]].vertex;
-		RGUI_DRAW_DBGPRINT("%d  vt(%f %f)", v0.x, v0.y);
->>>>>>> parent of 0ca0d1f (indices error fixed)
 	}
 
 	//for (i = 0; i < index_buffer.size(); i++) {
