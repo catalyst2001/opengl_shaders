@@ -253,23 +253,17 @@ int main()
 	drawlist.init();
 	drawlist.clear();
 
-	drawlist.set_texture(1);
-	r_gui_vertex verts[] = {
-		{{0, 0}, {0, 0}, {255, 0, 0}},
-		{{100, 0}, {0, 0}, {0, 255, 0}},
-		{{100, 100}, {0, 0}, {0, 0, 255}},
-		{{0, 100}, {0, 0}, {255, 255, 0}},
-	};
-	drawlist.push_rect(verts);
-
-	drawlist.set_texture(2);
-	r_gui_vertex verts2[] = {
-		{{500+0, 500 + 0}, {0, 0}, {255, 0, 0}},
-		{{500+100, 500 + 0}, {0, 0}, {0, 255, 0}},
-		{{500+100, 500 + 100}, {0, 0}, {0, 0, 255}},
-		{{500+0, 500 + 100}, {0, 0}, {255, 255, 0}},
-	};
-	drawlist.push_rect(verts2);
+	for (int i = 0; i < 100; i++) {
+		drawlist.set_texture(i);
+		int offset = i * 10;
+		r_gui_vertex verts[] = {
+			{{offset + 0, offset + 0}, {0, 0}, {255, 0, 0}},
+			{{offset + 100, offset + 0}, {0, 0}, {0, 255, 0}},
+			{{offset + 100, offset + 100}, {0, 0}, {0, 0, 255}},
+			{{offset + 0, offset + 100}, {0, 0}, {255, 255, 0}},
+		};
+		drawlist.push_rect(verts);
+	}
 	drawlist.commit();
 
 	r_gui_draw_list::drawcmd_info info;

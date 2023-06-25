@@ -5,9 +5,6 @@
     <ClCompile Include="gui\r_gui_base.cpp">
       <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="gui\r_gui_draw.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
     <ClCompile Include="gui\r_gui_frame.cpp">
       <Filter>gui</Filter>
     </ClCompile>
@@ -93,6 +90,9 @@
       <Filter>render</Filter>
     </ClInclude>
     <ClInclude Include="gl_debug_message.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="gl_buffer.h">
       <Filter>render</Filter>
     </ClInclude>
   </ItemGroup>

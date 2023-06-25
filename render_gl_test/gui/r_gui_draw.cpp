@@ -9,6 +9,12 @@
 #include "r_gl_errors.h"
 #include "r_gui_image_utils.h"
 
+template<typename _type>
+_type handle_cast(rgui_handle &handle)
+{
+	return (_type)rgui_handle_internal(handle).get_handle();
+}
+
 #ifdef _DEBUG
 #define RGUI_DRAW_DBGPRINT(a, ...) printf(__FUNCSIG__": " a "\n", __VA_ARGS__)
 #else
@@ -45,7 +51,7 @@
 	}
 */
 
-bool r_gui_draw::image_load(rgui_himage &dst_himg, const char *p_path, bool b_flip_vertical)
+bool r_gui_loader_gl::image_load(rgui_himage &dst_himg, const char *p_path, bool b_flip_vertical)
 {
 	r_image image(p_path, b_flip_vertical);
 	if (image.get_status() != r_image::IMGLDR_STATUS_OK)
@@ -61,79 +67,55 @@ bool r_gui_draw::image_load(rgui_himage &dst_himg, const char *p_path, bool b_fl
 	return true;
 }
 
-void r_gui_draw::image_free(rgui_himage img)
+void r_gui_loader_gl::image_free(rgui_himage img)
 {
-	GLuint texture = (GLuint)img;
+	GLuint texture = handle_cast<GLuint>(img);
 	if (glIsTexture(texture))
 		glDeleteTextures(1, &texture);
 }
 
-void r_gui_draw::image_draw(const r_rect &rect, rgui_himage h_img)
-{
-	
-
-
-
-
-}
-
-void r_gui_draw::image_draw_uv(const r_rect &rect, const r_uv_rect &uvs, rgui_himage h_img)
-{
-}
-
-bool r_gui_draw::font_load(rgui_hfont &h_dst_hfont, const char *p_file)
+bool r_gui_loader_gl::font_load(rgui_hfont &h_dst_hfont, const char *p_file)
 {
 	return false;
 }
 
-void r_gui_draw::font_free(rgui_hfont h_font)
+void r_gui_loader_gl::font_free(rgui_hfont h_font)
 {
 }
 
-void r_gui_draw::font_get_info(r_font_info &dst_info, rgui_hfont h_font)
+void r_gui_loader_gl::font_get_info(r_font_info &dst_info, rgui_hfont h_font)
 {
 }
 
-void r_gui_draw::font_draw_glyph(rgui_hfont h_font, int c)
-{
-}
-
-void r_gui_draw::font_draw_text(rgui_hfont h_font, const char *p_text)
-{
-}
-
-void r_gui_draw::font_draw_textf(rgui_hfont h_font, const char *p_format, ...)
-{
-}
-
-int r_gui_draw::skin_load(rgui_hskin &dst_hskin, const char *p_skintext)
+int r_gui_loader_gl::skin_load(rgui_hskin &dst_hskin, const char *p_skintext)
 {
 	return 0;
 }
 
-int r_gui_draw::skin_load_from_file(rgui_hskin &dst_hskin, const char *p_hfile)
+int r_gui_loader_gl::skin_load_from_file(rgui_hskin &dst_hskin, const char *p_hfile)
 {
 	return 0;
 }
 
-void r_gui_draw::skin_free(rgui_hskin h_skin)
+void r_gui_loader_gl::skin_free(rgui_hskin h_skin)
 {
 }
 
-int r_gui_draw::skin_find_group(rgui_skin_idx &dst_idx, const char *p_groupname)
+int r_gui_loader_gl::skin_find_group(rgui_skin_idx &dst_idx, const char *p_groupname)
 {
 	return 0;
 }
 
-r_uv_rect *r_gui_draw::skin_get_rect_from_idx(rgui_skin_idx group_idx)
+r_rect *r_gui_loader_gl::skin_get_rect_from_idx(rgui_skin_idx group_idx)
 {
 	return nullptr;
 }
 
-r_uv_rect *r_gui_draw::skin_get_uv_rect_from_idx(rgui_skin_idx group_idx)
+r_uv_rect *r_gui_loader_gl::skin_get_uv_rect_from_idx(rgui_skin_idx group_idx)
 {
 	return nullptr;
 }
+
 
 void r_gui_draw_list::push_current_drawcmd()
 {
@@ -200,6 +182,7 @@ void r_gui_draw_list::shutdown()
 
 void r_gui_draw_list::update_fixed(r_gui_vertex *p_verts, uint32_t *p_indices, uint32_t verts_offset, uint32_t verts_num, uint32_t indices_offset, uint32_t indices_num)
 {
+
 }
 
 void r_gui_draw_list::set_texture(GLuint texid)

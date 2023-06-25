@@ -165,7 +165,6 @@
     <ClCompile Include="buffer.cpp" />
     <ClCompile Include="gl_debug_message.cpp" />
     <ClCompile Include="gui\r_gui_base.cpp" />
-    <ClCompile Include="gui\r_gui_draw.cpp" />
     <ClCompile Include="gui\r_gui_frame.cpp" />
     <ClCompile Include="gui\r_gui_image_utils.cpp" />
     <ClCompile Include="gui\r_gui_memory.cpp" />
@@ -179,6 +178,7 @@
     <ClInclude Include="..\common\stb\stb_image.h" />
     <ClInclude Include="..\common\stb\stb_truetype.h" />
     <ClInclude Include="buffer.h" />
+    <ClInclude Include="gl_buffer.h" />
     <ClInclude Include="gl_debug_message.h" />
     <ClInclude Include="gui\r_gui_base.h" />
     <ClInclude Include="gui\r_gui_colors.h" />

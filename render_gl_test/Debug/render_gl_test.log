@@ -3,4 +3,5 @@ c:\program files (x86)\windows kits\10\include\10.0.22000.0\shared\minwindef.h(1
   e:\github\opengl_shaders\common\glad\glad.h(32): note: см. предыдущее определение "APIENTRY"
 e:\github\opengl_shaders\render_gl_test\main.cpp(48): warning C4018: <: несоответствие типов со знаком и без знака
 e:\github\opengl_shaders\render_gl_test\main.cpp(95): warning C4101: error: неиспользованная локальная переменная
-  render_gl_test.vcxproj -> E:\GITHUB\opengl_shaders\Debug\render_gl_test.exe
+e:\github\opengl_shaders\render_gl_test\main.cpp(269): error C2039: drawcmd_info: не является членом "r_gui_draw_list"
+  e:\github\opengl_shaders\render_gl_test\gui\r_gui_draw.h(51): note:  см. объявление "r_gui_draw_list"
