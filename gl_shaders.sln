@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "draw_aa_line", "draw_aa_lin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example_rotating_cube", "example_rotating_cube\example_rotating_cube.vcxproj", "{E55E2F13-E920-4828-98A2-A5BDE628690C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "abstract_render_api", "abstract_render_api\abstract_render_api.vcxproj", "{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{E55E2F13-E920-4828-98A2-A5BDE628690C}.Release|x64.Build.0 = Release|x64
 		{E55E2F13-E920-4828-98A2-A5BDE628690C}.Release|x86.ActiveCfg = Release|Win32
 		{E55E2F13-E920-4828-98A2-A5BDE628690C}.Release|x86.Build.0 = Release|Win32
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Debug|x64.ActiveCfg = Debug|x64
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Debug|x64.Build.0 = Debug|x64
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Debug|x86.ActiveCfg = Debug|Win32
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Debug|x86.Build.0 = Debug|Win32
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Release|x64.ActiveCfg = Release|x64
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Release|x64.Build.0 = Release|x64
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Release|x86.ActiveCfg = Release|Win32
+		{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

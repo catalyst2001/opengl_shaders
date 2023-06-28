@@ -52,7 +52,13 @@ class gl_buffer
 	GLenum alloc_memory(GLuint &dst_buffer, GLsizei _size) {
 		glGenBuffers(1, &dst_buffer);
 		glBindBuffer(buffer_target, dst_buffer);
-		glBufferData(buffer_target, _size * sizeof(_type), NULL, access_freqency);
+		glBufferData(buffer_target, _size, NULL, access_freqency);
+		return glGetError();
+	}
+
+	GLenum copy_memory(const GLuint &buffer, const void *p_data, GLintptr offset, GLsizeiptr count) {
+		glBindBuffer(buffer_target, buffer);
+		glBufferSubData(buffer_target, offset, count, p_data);
 		return glGetError();
 	}
 
@@ -142,13 +148,28 @@ public:
 		glGetBufferParameteriv(buffer_target, GL_BUFFER_SIZE, (GLint *)p_dst_size);
 		return glGetError();
 	}
+
+	GL_BUFFER_STATUS write_data(_type *p_data, GLintptr offset, GLsizei count) {
+		GLenum status;
+		gl_buffer_bind_saver bind_save(this);
+		status = copy_memory(buffer, p_data, offset, count);
+		if (status != GL_NO_ERROR)
+			return gl_buffer_error_to_buffer_status(status);
+
+		return BUFFER_STATUS_OK;
+	}
+
+	GL_BUFFER_STATUS read_data(_type *p_dst_data, ...) {
+
+	}
 };
 
 void test()
 {
-	gl_buffer<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, float> buffer;
-	if (buffer.alloc(10000) == BUFFER_STATUS_OK) {
+	gl_buffer<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, float> vertex_buffer;
+	if (vertex_buffer.alloc(10000) == BUFFER_STATUS_OK) {
 
 	}
+	vertex_buffer.free();
 }
 
