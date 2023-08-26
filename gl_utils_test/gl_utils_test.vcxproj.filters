@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="gl_utils_test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="glutils">
+      <UniqueIdentifier>{d2c09906-8e2b-4dd1-8366-5bee87279119}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GL\wglext.h" />
+  </ItemGroup>
+</Project>

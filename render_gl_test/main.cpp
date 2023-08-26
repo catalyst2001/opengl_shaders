@@ -222,66 +222,66 @@ void debug()
 //	}
 }
 
-//void test1()
-//{
-//	GL_CALL(glGenVertexArrays(VAO_COUNT, vertex_array_objects));
-//	GL_CALL(glBindVertexArray(vertex_array_objects[VAO_2D]));
-//	drawlist.init();
-//	drawlist.clear();
-//
-//	for (int i = 0; i < 100; i++) {
-//		drawlist.set_texture(i);
-//		int offset = i * 10;
-//		r_gui_vertex verts[] = {
-//			{{offset + 0, offset + 0}, {0, 0}, {255, 0, 0}},
-//			{{offset + 100, offset + 0}, {0, 0}, {0, 255, 0}},
-//			{{offset + 100, offset + 100}, {0, 0}, {0, 0, 255}},
-//			{{offset + 0, offset + 100}, {0, 0}, {255, 255, 0}},
-//		};
-//		drawlist.push_rect(verts);
-//	}
-//	drawlist.commit();
-//
-//	r_gui_draw_list::drawcmd_info info;
-//	drawlist.query_drawcmd_info(info);
-//
-//	info.get_verts_data_offset();
-//
-//
-//	view = glm::mat4x4(1.f);
-//
-//	if (!create_default_shader()) {
-//		printf("Failed to create default shader\n");
-//		getchar();
-//		return 1;
-//	}
-//
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//
-//	GLuint projection_uniform = glGetUniformLocation(default_2d_shader.program, "projection");
-//
-//	while (!glfwWindowShouldClose(p_window)) {
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//		view = glm::mat4x4(1.f);
-//
-//		int width, height;
-//		glfwGetWindowSize(p_window, &width, &height);
-//		projection = glm::ortho(0.f, (float)width, 0.f, (float)height);
-//
-//		/* draw 2d objects */
-//		glBindVertexArray(vertex_array_objects[VAO_2D]);
-//		glUseProgram(default_2d_shader.program);
-//		glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
-//
-//		drawlist.draw();
-//
-//		/* draw 3d objects */
-//		//glBindVertexArray(vertex_array_objects[VAO_3D]);
-//
-//		glfwSwapBuffers(p_window);
-//		glfwPollEvents();
-//	}
-//}
+void test1()
+{
+	GL_CALL(glGenVertexArrays(VAO_COUNT, vertex_array_objects));
+	GL_CALL(glBindVertexArray(vertex_array_objects[VAO_2D]));
+	drawlist.init();
+	drawlist.clear();
+
+	for (int i = 0; i < 100; i++) {
+		drawlist.set_texture(i);
+		int offset = i * 10;
+		r_gui_vertex verts[] = {
+			{{offset + 0, offset + 0}, {0, 0}, {255, 0, 0}},
+			{{offset + 100, offset + 0}, {0, 0}, {0, 255, 0}},
+			{{offset + 100, offset + 100}, {0, 0}, {0, 0, 255}},
+			{{offset + 0, offset + 100}, {0, 0}, {255, 255, 0}},
+		};
+		drawlist.push_rect(verts);
+	}
+	drawlist.commit();
+
+	r_gui_draw_list::drawcmd_info info;
+	drawlist.query_drawcmd_info(info);
+
+	info.get_verts_data_offset();
+
+
+	view = glm::mat4x4(1.f);
+
+	if (!create_default_shader()) {
+		printf("Failed to create default shader\n");
+		getchar();
+		return 1;
+	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	GLuint projection_uniform = glGetUniformLocation(default_2d_shader.program, "projection");
+
+	while (!glfwWindowShouldClose(p_window)) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		view = glm::mat4x4(1.f);
+
+		int width, height;
+		glfwGetWindowSize(p_window, &width, &height);
+		projection = glm::ortho(0.f, (float)width, 0.f, (float)height);
+
+		/* draw 2d objects */
+		glBindVertexArray(vertex_array_objects[VAO_2D]);
+		glUseProgram(default_2d_shader.program);
+		glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, glm::value_ptr(projection));
+
+		drawlist.draw();
+
+		/* draw 3d objects */
+		//glBindVertexArray(vertex_array_objects[VAO_3D]);
+
+		glfwSwapBuffers(p_window);
+		glfwPollEvents();
+	}
+}
 
 void test_buffers()
 {

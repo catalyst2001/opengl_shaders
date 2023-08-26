@@ -1,0 +1,20 @@
+﻿  example_texture3d.cpp
+e:\github\opengl_shaders\example_texture3d\example_texture3d.cpp(106): warning C4244: инициализация: преобразование "double" в "float", возможна потеря данных
+LINK : warning LNK4098: библиотека по умолчанию "MSVCRT" противоречит использованию других библиотек; используйте параметр /NODEFAULTLIB:library
+example_texture3d.obj : error LNK2019: ссылка на неразрешенный внешний символ _gladLoadGL в функции _main
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glTexParameteri"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glClear"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glGetError"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glDrawArrays"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glBindTexture"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glDeleteTextures"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glGenTextures"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glTexImage3D"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glBindBuffer"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glGenBuffers"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glBufferData"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glEnableVertexAttribArray"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glVertexAttribPointer"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glBindVertexArray"
+example_texture3d.obj : error LNK2001: неразрешенный внешний символ "_glad_glGenVertexArrays"
+E:\GITHUB\opengl_shaders\Debug\example_texture3d.exe : fatal error LNK1120: неразрешенных внешних элементов: 16

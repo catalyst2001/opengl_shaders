@@ -43,26 +43,43 @@ struct r_monitor_info
 	char manufacturer[32];
 };
 
-struct r_render_api
+typedef void *r_ptr_t;
+struct r_handle_t { r_ptr_t unused; };
+
+typedef r_handle_t r_hvertex_buffer;
+typedef r_handle_t r_hindex_buffer;
+
+class r_render_api
 {
+public:
 	/* ENUMERATE VIDEO ADAPTERS */
-	int              (*get_video_adapters_number)();
-	bool             (*get_video_adapter_info)(r_video_adapter_info *p_dst_info, int adapter_index);
+	virtual int              get_video_adapters_number() = 0;
+	virtual bool             get_video_adapter_info(r_video_adapter_info *p_dst_info, int adapter_index) = 0;
 		             
 	/* ENUMERATE MONITORS  */
-	int              (*get_monitors_number)();
-	int              (*get_default_monitor_index)();
-	bool             (*get_monitor_info)(r_monitor_info *p_dst_info, int monitor_index);
+	virtual int              get_monitors_number() = 0;
+	virtual int              get_default_monitor_index() = 0;
+	virtual bool             get_monitor_info(r_monitor_info *p_dst_info, int monitor_index) = 0;
 
 	/* RENDER DEVICES */
-	r_render_device *(*device_create)(R_RENDER_DRIVER driver, int color_bits, int depth_bits, int stencil_bits);
-	int              (*device_remove)(r_render_device *p_device);
+	virtual r_render_device *device_create(R_RENDER_DRIVER driver, int color_bits, int depth_bits, int stencil_bits) = 0;
+	virtual int              device_remove(r_render_device *p_device) = 0;
 };
+
+#define R_VERTEX_BUFFER 0
+#define R_INDEX_BUFFER 1
+
+#define R_BUFFER_ACCESS_STATIC 0
+#define R_BUFFER_ACCESS_DYNAMIC 1
+
+#define R_BUFFER_MEMORY_ALL 0
+#define R_BUFFER_MEMORY_READONLY 1
+#define R_BUFFER_MEMORY_WRITEONLY 2
 
 struct r_render_device
 {
 	/* INIT DEVICE */
-	void            *(*run)();
+	virtual int  run_device() = 0;
 
 	/* DEVICE INFO */
 	const char      *(*get_device_name)();
@@ -73,6 +90,7 @@ struct r_render_device
 	void            *(*set_stencil_bits)(int stencil_bits);
 				    
 	void            *(*set_clear_color)(int color);
+	void            *(*clear)(int color);
 
 	/* WINDOW */
 	void             (*set_window_caption)(const char *p_title);
@@ -84,6 +102,21 @@ struct r_render_device
 	bool             (*set_flags_var)(int *p_flags);
 	void            *(*begin_scene)();
 	void            *(*end_scene)();
+
+	/* HARDWARE BUFFERS */
+	int              (*buffer_alloc)(r_hvertex_buffer *p_dst_buffer, int buffer_type, int buffer_memory_access, size_t bytes);
+	int              (*buffer_bind)(r_hvertex_buffer h_buffer);
+	int              (*buffer_free)(r_hvertex_buffer h_buffer);
+	int              (*buffer_copy)(r_hvertex_buffer h_dest_buffer, r_hvertex_buffer h_src_buffer);
+
+	int              (*buffer_write)();
+	int              (*buffer_read)();
+
+	int              (*buffer_map)(r_hvertex_buffer h_buffer, void **p_ptr);
+	int              (*buffer_unmap)(r_hvertex_buffer h_buffer, void **p_ptr);
+
+	/* RENDER TARGETS */
+	int              (*create_render_target)();
 };
 
 r_render_api *r_get_render_api();
@@ -129,17 +162,20 @@ void test_render()
 
 	p_device->set_window_caption("Test render application");
 	p_device->set_clear_color(R_RGBA(20, 20, 20, 255));
-	p_device->run();
+	if (p_device->run_device()) {
+		r_hvertex_buffer vertex_buffer;
+		p_device->buffer_alloc(&vertex_buffer, R_BUFFER_ACCESS_STATIC, R_BUFFER_MEMORY_ALL, 10000);
 
-	p_device->set_flags_var(&render_flags);
-	while (render_flags & DEVICE_FLAG_ACTIVE) {
-		p_device->begin_scene();
+		p_device->set_flags_var(&render_flags);
+		while (render_flags & DEVICE_FLAG_ACTIVE) {
+			p_device->begin_scene();
 
 
 
 
 
-		p_device->end_scene();
+			p_device->end_scene();
+		}
 	}
 	p_render->device_remove(p_device);
 }
