@@ -155,13 +155,18 @@
     <ClCompile Include="list.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="murmurhash.cpp" />
+    <ClCompile Include="gl_context.cpp" />
+    <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array_fixed.h" />
     <ClInclude Include="gl_render.h" />
     <ClInclude Include="fastop_container.h" />
+    <ClInclude Include="ire_render.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="murmurhash.h" />
+    <ClInclude Include="gl_context.h" />
+    <ClInclude Include="window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

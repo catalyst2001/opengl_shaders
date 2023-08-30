@@ -1,2 +1,11 @@
 ﻿  gl_render.cpp
-  gl_render2.vcxproj -> E:\GITHUB\opengl_shaders\Debug\gl_render2.exe
+e:\github\opengl_shaders\gl_render2\ire_render.h(36): error C3646: textures: неизвестный спецификатор переопределения
+e:\github\opengl_shaders\gl_render2\ire_render.h(36): error C2143: синтаксическая ошибка: отсутствие "," перед "["
+e:\github\opengl_shaders\gl_render2\ire_render.h(36): error C2143: синтаксическая ошибка: отсутствие ")" перед ";"
+e:\github\opengl_shaders\gl_render2\ire_render.h(36): error C2238: непредвиденные лексемы перед ";"
+e:\github\opengl_shaders\gl_render2\ire_render.h(201): error C2011: RENDER_SHADER_LDR_TYPE: переопределение типа "enum"
+  e:\github\opengl_shaders\gl_render2\ire_render.h(189): note:  см. объявление "RENDER_SHADER_LDR_TYPE"
+  list.cpp
+  murmurhash.cpp
+  gl_context.cpp
+  Создание кода...
