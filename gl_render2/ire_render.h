@@ -1,7 +1,7 @@
 /*
  React Game Engine Renderer
 
- Purpose: General game engine rendering API's
+ Purpose: General game engine rendering API's implemented on OpenGL
  Author: Deryabin K. "catalyst" & Iminhodzaev O. "Nemox"
  Date: 28.08.2023 3:10
  File: ire_render.h
@@ -18,6 +18,7 @@ enum RENDER_STATUS {
 	RENDER_STATUS_ERROR_CREATE_CONTEXT,
 	RENDER_STATUS_ERROR_UNSUPPORTED_DISPLAY_RESOLUTION,
 	RENDER_STATUS_ERROR_INVALID_PARAMETER,
+	RENDER_STATUS_ERROR_PARAMETER_NOT_CHANGED,
 
 };
 
@@ -326,6 +327,7 @@ public:
 
 	virtual int change_screen_mode(int screen_mode) = 0;
 	virtual int change_screen_resolution(int width, int height) = 0;
+	virtual int set_multisampling_samples(char *p_dsterr, size_t maxlen, int n_samples) = 0;
 
 	/* extensions */
 	virtual bool ext_avalible(const char *p_extname) = 0;

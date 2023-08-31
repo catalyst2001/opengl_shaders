@@ -21,6 +21,16 @@
 
 #endif
 
+const char *va(const char *p_format, ...)
+{
+	static char buf[1024];
+	va_list argptr;
+	va_start(argptr, p_format);
+	vsprintf_s(buf, sizeof(buf), p_format, argptr);
+	va_end(argptr);
+	return buf;
+}
+
 /* MAIN VIDEO DEVICES QUERY INFO CLASS */
 class sys_visual_info : public ire_visual_info
 {
@@ -69,6 +79,8 @@ public:
 
 	virtual int change_screen_mode(int screen_mode);
 	virtual int change_screen_resolution(int width, int height);
+
+	virtual int set_multisampling_samples(char *p_dsterr, size_t maxlen, int n_samples);
 
 	/* textures (draft 1) */
 	virtual int texture_load(htex_t *p_dst_texture, const texture_create_info_t *p_create_info);

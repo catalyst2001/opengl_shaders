@@ -170,7 +170,17 @@ bool gl_render::create_gl_context(char *p_dst_error, size_t dstlen)
 
 bool gl_render::destroy_gl_context()
 {
+#if LINUX
 
+
+#else
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(h_glctx);
+	wglDeleteContext(h_shared_glctx);
+	h_glctx = NULL;
+	h_shared_glctx = NULL;
+	ReleaseDC(h_window, h_devctx);
+#endif
 	return 0;
 }
 
@@ -203,7 +213,7 @@ gl_render::~gl_render()
 #endif
 }
 
-int gl_render::init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info)
+int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_t *p_init_info)
 {
 	flags |= p_init_info->flags;
 	width = p_init_info->width;
@@ -214,41 +224,74 @@ int gl_render::init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *
 #if defined LINUX
 
 #else
+	DWORD last_error;
 	WNDCLASSEXA wcw;
 	memset(&wcw, 0, sizeof(wcw));
 	wcw.cbSize = sizeof(wcw);
+	wcw.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
+	wcw.lpszClassName = WINDOW_ID;
 	wcw.hbrBackground = NULL;
 	wcw.hCursor = LoadCursor(NULL, MAKEINTRESOURCEW(IDC_ARROW));
 	wcw.hIcon = NULL;
 	wcw.hIconSm = NULL;
 	wcw.hInstance = GetModuleHandleA(NULL);
-	wcw.lpszClassName = WINDOW_ID;
-	wcw.style = CS_HREDRAW | CS_VREDRAW;
 	wcw.lpfnWndProc = wnd_proc;
 	if (!RegisterClassExA(&wcw))
 		return RENDER_STATUS_ERROR_INIT_WINDOW_SUBSYSTEM;
 
 #define WINDOW_FLAGS (WS_VISIBLE|WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX)
 
-	h_window = CreateWindowExA(0, wcw.lpszClassName, "ReactEngine GL Renderer", WINDOW_FLAGS, ));
+	h_window = CreateWindowExA(0, wcw.lpszClassName, "ReactEngine GL Renderer",
+		WINDOW_FLAGS,
+		0, 0, width, height,
+		HWND_DESKTOP,
+		(HMENU)NULL,
+		NULL,
+		NULL);
 
+	if (!h_window) {
+		last_error = GetLastError();
+		r_nprintf(p_dst_error, maxlen, "ChoosePixelFormat failed! LastError() = %d (0x%x)", last_error, last_error);
+		return RENDER_STATUS_ERROR_WINDOW;
+	}
+
+	ShowWindow(h_window, SW_SHOW);
+	UpdateWindow(h_window);
+
+	if (!create_gl_context(p_dst_error, maxlen))
+		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
 
 #endif
-	return 0;
+	return RENDER_STATUS_OK;
 }
 
 int gl_render::shutdown()
 {
+	/* unloading resources */
+
+	/* destroy GL context */
+	destroy_gl_context();
+
+	/* destroy window */
+	
+
+
 	return 0;
 }
 
 int gl_render::set_window_title(const char *p_title, ...)
 {
-	return 0;
+	char buf[256];
+	va_list argptr;
+	va_start(argptr, p_title);
+	vsprintf_s(buf, sizeof(buf), p_title, argptr);
+	va_end(argptr);
+	return SetWindowTextA(h_window, buf);
 }
 
 int gl_render::get_window_title(char *p_dst, size_t dstlen)
 {
+	GetWindowTextA(h_window, p_dst, (int)dstlen);
 	return 0;
 }
 
@@ -266,4 +309,17 @@ bool gl_render::ext_avalible(const char *p_extname)
 		return strstr(p_exts_str, p_extname) != NULL;
 	}
 #endif
+}
+
+int gl_render::set_multisampling_samples(char *p_dsterr, size_t maxlen, int n_samples)
+{
+	if (samples == n_samples)
+		return RENDER_STATUS_ERROR_PARAMETER_NOT_CHANGED;
+
+	destroy_gl_context();
+	samples = n_samples;
+	if (!create_gl_context(p_dsterr, maxlen))
+		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
+
+	return RENDER_STATUS_OK;
 }
