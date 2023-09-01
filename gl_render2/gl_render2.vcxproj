@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="glad\glad.c" />
     <ClCompile Include="gl_render.cpp" />
     <ClCompile Include="list.cpp" />
     <ClCompile Include="main.cpp" />
@@ -160,12 +161,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array_fixed.h" />
+    <ClInclude Include="glad\glad.h" />
+    <ClInclude Include="glad\khrplatform.h" />
     <ClInclude Include="gl_render.h" />
     <ClInclude Include="fastop_container.h" />
     <ClInclude Include="ire_render.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="murmurhash.h" />
     <ClInclude Include="gl_context.h" />
+    <ClInclude Include="re_container.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

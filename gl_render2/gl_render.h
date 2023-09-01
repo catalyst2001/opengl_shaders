@@ -16,20 +16,141 @@
 #include <gl/GL.h>
 #include <gl/glu.h>
 #include "GL/wglext.h"
+#include "glad/glad.h"
 
 #define r_nprintf(b, s, f, ...) sprintf_s(b, s, f, __VA_ARGS__)
 
 #endif
 
-const char *va(const char *p_format, ...)
+#if defined(GL_DEBUG_MODE) || defined(_DEBUG)
+#define GL_CALL(func)\
+	func;\
+	if(glGetError() != GL_NO_ERROR)\
+		printf("[GL_DEBUG_MODE] Call " #func " failed with error %d!\n", glGetError());
+
+#else
+
+#endif
+
+const char *va(const char *p_format, ...);
+
+/* GL BUFFERS BINDING SAVER CLASS FOR CORE PROFILE */
+template<GLint binding>
+constexpr GLint get_target_from_binding_name()
 {
-	static char buf[1024];
-	va_list argptr;
-	va_start(argptr, p_format);
-	vsprintf_s(buf, sizeof(buf), p_format, argptr);
-	va_end(argptr);
-	return buf;
+	if constexpr (binding == GL_ARRAY_BUFFER_BINDING)
+		return GL_ARRAY_BUFFER;
+	
+	if constexpr (binding == GL_PIXEL_PACK_BUFFER_BINDING)
+		return GL_PIXEL_PACK_BUFFER;
+
+	if constexpr (binding == GL_ELEMENT_ARRAY_BUFFER_BINDING)
+		return GL_ELEMENT_ARRAY_BUFFER;
+
+	if constexpr (binding == GL_TEXTURE_BINDING_1D)
+		return GL_TEXTURE_1D;
+
+	if constexpr (binding == GL_TEXTURE_BINDING_2D)
+		return GL_TEXTURE_2D;
+
+	if constexpr (binding == GL_TEXTURE_BINDING_3D)
+		return GL_TEXTURE_3D;
+
+	if constexpr (binding == GL_TEXTURE_BINDING_CUBE_MAP)
+		return GL_TEXTURE_CUBE_MAP;
+
+	static_assert(false, __FUNCSIG__ ": Failed to find specified binding!");
+	return 0;
 }
+
+template<GLint target>
+constexpr GLint get_binding_name_from_target()
+{
+	if constexpr (target == GL_ARRAY_BUFFER)
+		return GL_ARRAY_BUFFER_BINDING;
+
+	if constexpr (target == GL_PIXEL_PACK_BUFFER)
+		return GL_PIXEL_PACK_BUFFER_BINDING;
+
+	if constexpr (target == GL_ELEMENT_ARRAY_BUFFER)
+		return GL_ELEMENT_ARRAY_BUFFER_BINDING;
+
+	if constexpr (target == GL_TEXTURE_1D)
+		return GL_TEXTURE_BINDING_1D;
+
+	if constexpr (target == GL_TEXTURE_2D)
+		return GL_TEXTURE_BINDING_2D;
+
+	if constexpr (target == GL_TEXTURE_3D)
+		return GL_TEXTURE_BINDING_3D;
+
+	if constexpr (target == GL_TEXTURE_CUBE_MAP)
+		return GL_TEXTURE_BINDING_CUBE_MAP;
+
+	static_assert(false, __FUNCSIG__ ": Failed to find specified target!");
+	return 0;
+}
+
+template<GLint target>
+class gl_buffer_binding_saver
+{
+	GLint previous_name;
+public:
+	gl_buffer_binding_saver() { glGetIntegerv(get_binding_name_from_target<target>(), &previous_name); }
+	~gl_buffer_binding_saver() { glBindBuffer(target, previous_name); }
+};
+
+/* GL UI 2D MESH */
+class gl_ui_buffer
+{
+	enum UI_GL_BUFFER {
+		UI_BUFFER_VBO = 0,
+		UI_BUFFER_IBO,
+
+		UI_BUFFERS_COUNT
+	};
+
+	enum UI_GL_BUFFER_DEFAULS {
+		UI_BUFFER_VBO_SIZE_DEFAULT = 1024,
+		UI_BUFFER_IBO_SIZE_DEFAULT = 1024
+	};
+
+	GLsizeiptr ibo_capacity;
+	GLsizeiptr vbo_capacity;
+	GLuint buffers[UI_BUFFERS_COUNT];
+	std::vector<unsigned int> indices;
+	std::vector<ui_mesh_vertex_t> vertices;
+	std::vector<mesh_draw_command_t> drawcmds;
+public:
+	gl_ui_buffer();
+	~gl_ui_buffer();
+
+	int init(size_t start_vbo_size = 0, size_t start_ibo_size = 0, size_t start_cmd_size = 0);
+	int shutdown();
+
+	/* clear temp vertex buffer*/
+	void clear();
+
+	/* commit temp vertices data to video memory */
+	bool commit();
+
+	/* push geometry */
+	void push_vertex(ui_mesh_vertex_t *p_verts, uint32_t count);
+	void push_triangle(ui_mesh_vertex_t *p_verts);
+	void push_rect(ui_mesh_vertex_t *p_verts);
+
+	/* update vertices */
+	bool update(uint32_t start_index, ui_mesh_vertex_t *p_vertices, uint32_t count_indices);
+};
+
+void UTIL_draw_ui_buffer(const gl_ui_buffer &ui_vertex_buffer);
+
+class gl_text_buffer
+{
+public:
+
+
+};
 
 /* MAIN VIDEO DEVICES QUERY INFO CLASS */
 class sys_visual_info : public ire_visual_info
@@ -43,12 +164,18 @@ public:
 class gl_render : public ire_render
 {
 	int flags;
+	int wflags;
 	int width;
 	int height;
 	int color_bits;
 	int depth_bits;
 	int stencil_bits;
 	int samples;
+
+	/* gl resources */
+	GLint vao_2d, vao_3d;
+	GLint ui_vbo, ui_ibo;
+
 #if defined LINUX
 
 #else
@@ -63,6 +190,8 @@ class gl_render : public ire_render
 	bool create_gl_context(char *p_dst_error, size_t dstlen);
 	bool destroy_gl_context();
 
+	int init_gl_renderer(char *p_dst_error, size_t maxlen);
+
 public:
 	gl_render();
 	~gl_render();
@@ -70,8 +199,11 @@ public:
 	/* render init/shutdown */
 	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info);
 	virtual int shutdown();
+	virtual int render_cycle();
+
 	virtual int set_window_title(const char *p_title, ...);
 	virtual int get_window_title(char *p_dst, size_t dstlen);
+	virtual int get_window_size(window_size_t *p_dst_size);
 
 	/* settings */
 	virtual int enable(int param);

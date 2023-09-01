@@ -8,6 +8,16 @@
 
 #include <vector> //TEMP USE!
 
+const char *va(const char *p_format, ...)
+{
+	static char buf[1024];
+	va_list argptr;
+	va_start(argptr, p_format);
+	vsprintf_s(buf, sizeof(buf), p_format, argptr);
+	va_end(argptr);
+	return buf;
+}
+
 /* material */
 
 /* mesh instance */
@@ -180,13 +190,30 @@ bool gl_render::destroy_gl_context()
 	h_glctx = NULL;
 	h_shared_glctx = NULL;
 	ReleaseDC(h_window, h_devctx);
+	h_devctx = NULL;
 #endif
 	return 0;
 }
 
+int gl_render::init_gl_renderer(char *p_dst_error, size_t maxlen)
+{
+	if (!create_gl_context(p_dst_error, maxlen))
+		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
+
+	if (!gladLoadGL())
+		return RENDER_STATUS_ERROR_NEEDED_EXTENSIONS_NO_AVALIBLE;
+
+
+
+
+
+	return RENDER_STATUS_OK;
+}
+
 gl_render::gl_render()
 {
-	flags = 0;
+	flags = RENDER_INIT_FLAG_DEFAULT;
+	wflags = RENDER_WINDOW_FLAG_NONE;
 	width = 640;
 	height = 480;
 	color_bits = 24;
@@ -215,6 +242,8 @@ gl_render::~gl_render()
 
 int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_t *p_init_info)
 {
+	int status;
+	window_size_t size;
 	flags |= p_init_info->flags;
 	width = p_init_info->width;
 	height = p_init_info->height;
@@ -258,8 +287,12 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 	ShowWindow(h_window, SW_SHOW);
 	UpdateWindow(h_window);
 
-	if (!create_gl_context(p_dst_error, maxlen))
-		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
+	status = init_gl_renderer(p_dst_error, maxlen);
+	if (status != RENDER_STATUS_OK)
+		return status;
+
+	get_window_size(&size);
+	glViewport(0, 0, size.width, size.height);
 
 #endif
 	return RENDER_STATUS_OK;
@@ -274,6 +307,22 @@ int gl_render::shutdown()
 
 	/* destroy window */
 	
+
+
+	return 0;
+}
+
+int gl_render::render_cycle()
+{
+	MSG msg;
+	while (wflags & RENDER_WINDOW_FLAG_RUNNING) {
+		if (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessageA(&msg);
+		}
+
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	}
 
 
 	return 0;
@@ -295,6 +344,35 @@ int gl_render::get_window_title(char *p_dst, size_t dstlen)
 	return 0;
 }
 
+int gl_render::get_window_size(window_size_t *p_dst_size)
+{
+	RECT rect;
+	GetClientRect(h_window, &rect);
+	p_dst_size->width = rect.right;
+	p_dst_size->height = rect.bottom;
+	return 0;
+}
+
+int gl_render::enable(int param)
+{
+	return 0;
+}
+
+int gl_render::disable(int param)
+{
+	return 0;
+}
+
+int gl_render::change_screen_mode(int screen_mode)
+{
+	return 0;
+}
+
+int gl_render::change_screen_resolution(int width, int height)
+{
+	return 0;
+}
+
 bool gl_render::ext_avalible(const char *p_extname)
 {
 	const char *p_exts_str;
@@ -311,6 +389,141 @@ bool gl_render::ext_avalible(const char *p_extname)
 #endif
 }
 
+int gl_render::res_list_dump(const char *p_reslist)
+{
+	return 0;
+}
+
+int gl_render::res_list_reload(const char *p_reslist)
+{
+	return 0;
+}
+
+int gl_render::mesh_create(hmesh_t *p_dst_hmesh, const char *p_name, RENDER_MESH_UPADTE_TYPE update_type, RENDER_MESH_TYPE mesh_type, RENDER_MESH_HINT hint, void *p_verts_data, unsigned int num_verts)
+{
+	return 0;
+}
+
+int gl_render::mesh_find(hmesh_t *p_dst_mesh, const char *p_name)
+{
+	return 0;
+}
+
+int gl_render::mesh_info(hmesh_t h_mesh)
+{
+	return 0;
+}
+
+int gl_render::mesh_update(hmesh_t h_mesh, int mesh_hint, int mesh_type, void *p_verts_data, unsigned int num_verts)
+{
+	return 0;
+}
+
+int gl_render::mesh_delete(hmesh_t h_mesh)
+{
+	return 0;
+}
+
+int gl_render::mesh_get_flags(int *p_dst_flags, hmesh_t h_mesh)
+{
+	return 0;
+}
+
+int gl_render::skel_create(hskl_t *p_dst_hskl, const char *p_name)
+{
+	return 0;
+}
+
+int gl_render::skel_load(hskl_t *p_dst_hskl, const char *p_filename)
+{
+	return 0;
+}
+
+int gl_render::skel_find(hskl_t *p_dst_hskl, const char *p_name)
+{
+	return 0;
+}
+
+int gl_render::skel_dump(hskl_t h_skl, const char *p_filename)
+{
+	return 0;
+}
+
+int gl_render::skel_delete(hskl_t h_skl)
+{
+	return 0;
+}
+
+int gl_render::anim_create(hanim_t *p_dst_hanim, const char *p_name, float fps, uint32_t num_keyframes)
+{
+	return 0;
+}
+
+int gl_render::anim_load(hanim_t *p_dst_hanim, const char *p_path, const char *p_name)
+{
+	return 0;
+}
+
+int gl_render::anim_info(anim_info_t *p_dst_info, hanim_t h_anim)
+{
+	return 0;
+}
+
+int gl_render::anim_dump(hanim_t h_anim, const char *p_filename)
+{
+	return 0;
+}
+
+int gl_render::anim_delete(hanim_t h_anim)
+{
+	return 0;
+}
+
+int gl_render::model_create(hmdl_t *p_dst_hmdl, const char *p_name)
+{
+	return 0;
+}
+
+int gl_render::model_set_base_skeleton(hmdl_t h_mdl, hskl_t h_skel)
+{
+	return 0;
+}
+
+int gl_render::model_add_mesh_part(hmesh_t h_mesh, unsigned int offset)
+{
+	return 0;
+}
+
+int gl_render::model_skel_is_compatible(hmdl_t h_mdl, hskl_t h_skel)
+{
+	return 0;
+}
+
+int gl_render::model_anim_select(RENDER_ANIM_SELECT_TYPE anim_op_type, hmdl_t h_mdl, hanim_t h_anim, unsigned int start_frame, unsigned int end_frame, float blend_factor)
+{
+	return 0;
+}
+
+int gl_render::model_anim_set_blend_factor(hmdl_t h_mdl, hanim_t h_anim, float blend_factor)
+{
+	return 0;
+}
+
+int gl_render::model_anim_set_playback_speed(hmdl_t h_mdl, hanim_t h_anim, float fps)
+{
+	return 0;
+}
+
+int gl_render::model_info(model_info_t *p_dst_info, hmdl_t h_mdl)
+{
+	return 0;
+}
+
+int gl_render::model_delete(hmdl_t h_mdl)
+{
+	return 0;
+}
+
 int gl_render::set_multisampling_samples(char *p_dsterr, size_t maxlen, int n_samples)
 {
 	if (samples == n_samples)
@@ -322,4 +535,100 @@ int gl_render::set_multisampling_samples(char *p_dsterr, size_t maxlen, int n_sa
 		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
 
 	return RENDER_STATUS_OK;
+}
+
+int gl_render::texture_load(htex_t *p_dst_texture, const texture_create_info_t *p_create_info)
+{
+	return 0;
+}
+
+int gl_render::texture_free(htex_t h_texture)
+{
+	return 0;
+}
+
+int gl_render::shader_program_create(hshader_program_t *p_dst_hshaderprog, shader_program_compile_log_t *p_dstlog, const char *p_file_path)
+{
+	return 0;
+}
+
+int gl_render::shader_program_create_from_mem(hshader_program_t *p_dst_hshaderprog, shader_program_compile_log_t *p_dstlog, const shader_program_sources_ptrs_t *p_sources)
+{
+	return 0;
+}
+
+int gl_render::shader_program_create_from_SPIRV(hshader_program_t *p_dst_hshaderprog, shader_program_compile_log_t *p_dstlog, uint8_t *p_spirv_code, size_t size)
+{
+	return 0;
+}
+
+int gl_render::shader_program_get_binary(uint8_t **p_dst_ptr, size_t *p_dst_size, hshader_program_t h_shaderprog)
+{
+	return 0;
+}
+
+int gl_render::shader_program_binary_free_ptr(uint8_t *p_ptr)
+{
+	return 0;
+}
+
+int gl_render::shader_program_delete(hshader_program_t h_shaderprog)
+{
+	return 0;
+}
+
+int gl_render::shaders_reload_all()
+{
+	return 0;
+}
+
+int gl_render::set_lighting_shader(hshader_program_t h_shaderprog)
+{
+	return 0;
+}
+
+int gl_render::set_shadow_shader(hshader_program_t h_shaderprog)
+{
+	return 0;
+}
+
+gl_ui_buffer::gl_ui_buffer()
+{
+	buffers[0] = 0;
+	buffers[1] = 0;
+}
+
+gl_ui_buffer::~gl_ui_buffer()
+{
+}
+
+int gl_ui_buffer::init(size_t start_vbo_size, size_t start_ibo_size, size_t start_cmd_size)
+{
+	gl_buffer_binding_saver<GL_ARRAY_BUFFER> vbo_binding;
+	gl_buffer_binding_saver<GL_ELEMENT_ARRAY_BUFFER> ibo_binding;
+	ibo_capacity = UI_BUFFER_VBO_SIZE_DEFAULT;
+	vbo_capacity = UI_BUFFER_IBO_SIZE_DEFAULT;
+
+	if (start_vbo_size)
+		ibo_capacity = (GLsizei)start_vbo_size;
+
+	if (start_ibo_size)
+		vbo_capacity = (GLsizei)start_ibo_size;
+
+	glGenBuffers(UI_BUFFERS_COUNT, buffers); //allocate buffers
+
+	/* alloc vertex buffer */
+	glBindBuffer(buffers[UI_BUFFER_VBO], GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, )
+
+
+
+
+	/* alloc index buffer */
+	glBindBuffer(buffers[UI_BUFFER_IBO], GL_ELEMENT_ARRAY_BUFFER);
+
+
+
+
+	return 0;
 }

@@ -10,6 +10,10 @@
 #pragma once
 #include <stdint.h>
 
+struct window_size_t {
+	int width, height;
+};
+
 enum RENDER_STATUS {
 	RENDER_STATUS_OK = 0,
 	RENDER_STATUS_ERROR_OUT_OF_MEMORY,
@@ -19,6 +23,7 @@ enum RENDER_STATUS {
 	RENDER_STATUS_ERROR_UNSUPPORTED_DISPLAY_RESOLUTION,
 	RENDER_STATUS_ERROR_INVALID_PARAMETER,
 	RENDER_STATUS_ERROR_PARAMETER_NOT_CHANGED,
+	RENDER_STATUS_ERROR_NEEDED_EXTENSIONS_NO_AVALIBLE
 
 };
 
@@ -102,6 +107,19 @@ enum RENDER_MESH_UPADTE_TYPE {
 	RENDER_MESH_UPADTE_TYPE_STATIC = 0,
 	RENDER_MESH_UPADTE_TYPE_DYNAMIC,
 	RENDER_MESH_UPADTE_TYPE_AUTO
+};
+
+struct mesh_draw_command_t {
+	uint32_t material;
+	uint32_t start_index;
+	uint32_t count_indices;
+};
+
+/* UI MESH VERTEX STRUCT */
+struct ui_mesh_vertex_t {
+	vec2 vertex;
+	vec2 texcoord;
+	vec3 color;
 };
 
 /* NO ANIMATED MESH VERTEX STRUCT */
@@ -238,6 +256,10 @@ struct shader_program_compile_log_t {
 #define RENDER_INIT_FLAG_FULLSCREEN (1 << 1)
 #define RENDER_INIT_FLAG_MULTISAMPLING (1 << 2)
 
+/* render global flags */
+#define RENDER_WINDOW_FLAG_NONE    (0)
+#define RENDER_WINDOW_FLAG_RUNNING (1 << 0)
+
 struct re_render_init_info_t {
 	int flags;
 	int width;
@@ -301,9 +323,11 @@ public:
 	/* render init/shutdown */
 	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info) = 0;
 	virtual int shutdown() = 0;
+	virtual int render_cycle() = 0;
 
 	virtual int set_window_title(const char *p_title, ...) = 0;
 	virtual int get_window_title(char *p_dst, size_t dstlen) = 0;
+	virtual int get_window_size(window_size_t *p_dst_size) = 0;
 
 	/* textures (draft 1) */
 	virtual int texture_load(htex_t *p_dst_texture, const texture_create_info_t *p_create_info) = 0;
