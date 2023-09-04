@@ -1,0 +1,89 @@
+	static GLenum buffer_alloc(GLint *p_dst_name, GLenum target, GLsizeiptr size, const void *p_data, GLenum access) {
+		GLenum error;
+		GLint buffer;
+		glGenBuffers(1, &buffer);
+		glBindBuffer(target, buffer);
+		glBufferData(target, size, p_data, access);
+		error = glGetError();
+		GL_CHECK(error, "glBufferData")
+		return error;
+	}
+
+	static GLenum buffer_size_unbinded(GLsizeiptr *p_dst, GLint name, GLenum target) {
+		GLenum error;
+		glGetBufferParameteriv(target, GL_BUFFER_SIZE, (GLint *)p_dst);
+		error = glGetError();
+		GL_CHECK(error, "glGetBufferParameteriv")
+		return error;
+	}
+
+	static GLenum buffer_copy_data(GLint dst_name, GLint src_name, GLint read_offs, GLint write_offs, GLint size) {
+		GLenum error;
+		glBindBuffer(GL_COPY_WRITE_BUFFER, dst_name);
+		glBindBuffer(GL_COPY_READ_BUFFER, src_name);
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, read_offs, write_offs, size);
+		error = glGetError();
+		GL_CHECK(error, "glCopyBufferSubData")
+		return error;
+	}
+
+	static GLenum buffer_copy_data_to_ram(void *p_dst, GLsizeiptr dstlen, GLint src_name, GLenum target) {
+		GLenum error;
+		GLsizeiptr src_size;
+		glBindBuffer(target, src_name);
+		if (!buffer_size_unbinded(&src_size, src_name, target))
+			return false;
+
+		const GLubyte *p_data = glMapBuffer(target, GL_READ_ONLY);
+		error = glGetError();
+		if (!p_data) {
+			GL_CHECK(error, "glMapBuffer")
+				return error;
+		}
+		memcpy_s(p_dst, dstlen, p_data, (size_t)src_size);
+		glUnmapBuffer(target);
+		return error;
+	}
+
+	static GLenum buffer_realloc(GLint *p_dst_clone_name, GLint src_copy_name, GLenum target, GLsizeiptr newsize) {
+		GLenum error;
+		GLint buffer;
+		GLint buffer_access;
+		GLsizeiptr curr_buffer_size;
+		GLsizeiptr new_buffer_size;
+
+		glBindBuffer(target, src_copy_name);
+		error = buffer_size_unbinded(&curr_buffer_size, name, target);
+		if (error != GL_NO_ERROR)
+			return error;
+
+		GL_CHECK(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &buffer_access));
+
+		/* adjust new buffer size */
+		new_buffer_size = curr_buffer_size;
+		if (newsize > curr_buffer_size)
+			new_buffer_size = newsize;
+
+		/* allocate new buffer */
+		error = buffer_alloc(&buffer, target, new_buffer_size, NULL, buffer_access);
+		if (error != GL_NO_ERROR)
+			return error;
+
+		/* copy data from old buffer to new buffer */
+		error = buffer_copy_data(buffer, src_copy_name, 0, 0, curr_buffer_size);
+		if (error != GL_NO_ERROR)
+			return error;
+
+		*p_dst_clone_name = buffer;
+		return error;
+	}
+
+	static GLenum buffer_delete(GLint name) {
+		GLenum error;
+		glDeleteBuffers(1, &name);
+		error = glGetError();
+		return error;
+	}
+	
+	
+	GL_CHECK(glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &buffer_access)); // get GL_STATIC_DRAW ./ GL_DYNAMIC_DRAW

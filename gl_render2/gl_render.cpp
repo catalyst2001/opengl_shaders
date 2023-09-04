@@ -6,8 +6,6 @@
 #include "murmurhash.h"
 #include "list.h"
 
-#include <vector> //TEMP USE!
-
 const char *va(const char *p_format, ...)
 {
 	static char buf[1024];
@@ -28,9 +26,12 @@ struct r_mesh_instance_t {
 	mat4x4 transform;
 };
 
+render_log_message_callback log_msg;
 list_t materials_list;
 list_t meshes_list;
 std::vector<render_mesh_t *> meshes;
+
+#define LOG_MSG_INIT(funcptr) log_msg = funcptr;
 
 #if defined LINUX
 
@@ -41,7 +42,10 @@ LRESULT CALLBACK wnd_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
 	{
-
+	case WM_CLOSE: {
+		PostQuitMessage(0);
+		break;
+	}
 
 
 
@@ -197,16 +201,18 @@ bool gl_render::destroy_gl_context()
 
 int gl_render::init_gl_renderer(char *p_dst_error, size_t maxlen)
 {
+	LOG_NOTIFY("Initializing context...");
 	if (!create_gl_context(p_dst_error, maxlen))
 		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
 
+	LOG_NOTIFY("Loading extensions...");
 	if (!gladLoadGL())
 		return RENDER_STATUS_ERROR_NEEDED_EXTENSIONS_NO_AVALIBLE;
 
 
 
 
-
+	LOG_NOTIFY("Renderer initialized");
 	return RENDER_STATUS_OK;
 }
 
@@ -240,7 +246,7 @@ gl_render::~gl_render()
 #endif
 }
 
-int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_t *p_init_info)
+int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_t *p_init_info, render_log_message_callback p_log_callback)
 {
 	int status;
 	window_size_t size;
@@ -250,6 +256,10 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 	color_bits = p_init_info->color_bits;
 	depth_bits = p_init_info->depth_bits;
 	stencil_bits = p_init_info->stencil_bits;
+
+	LOG_MSG_INIT(p_log_callback)
+	LOG_NOTIFY("Initializing renderer subsystem...");
+
 #if defined LINUX
 
 #else
@@ -260,7 +270,7 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 	wcw.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
 	wcw.lpszClassName = WINDOW_ID;
 	wcw.hbrBackground = NULL;
-	wcw.hCursor = LoadCursor(NULL, MAKEINTRESOURCEW(IDC_ARROW));
+	wcw.hCursor = LoadCursorW(NULL, MAKEINTRESOURCEW(IDC_ARROW));
 	wcw.hIcon = NULL;
 	wcw.hIconSm = NULL;
 	wcw.hInstance = GetModuleHandleA(NULL);
@@ -287,6 +297,7 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 	ShowWindow(h_window, SW_SHOW);
 	UpdateWindow(h_window);
 
+	LOG_NOTIFY("Initializing OpenGL renderer...");
 	status = init_gl_renderer(p_dst_error, maxlen);
 	if (status != RENDER_STATUS_OK)
 		return status;
@@ -301,14 +312,16 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 int gl_render::shutdown()
 {
 	/* unloading resources */
+	LOG_NOTIFY("Unloading resouces...");
 
 	/* destroy GL context */
+	LOG_NOTIFY("Destroying OpenGL context...");
 	destroy_gl_context();
 
 	/* destroy window */
 	
 
-
+	LOG_NOTIFY("Shutdown renderer");
 	return 0;
 }
 
@@ -592,6 +605,8 @@ int gl_render::set_shadow_shader(hshader_program_t h_shaderprog)
 	return 0;
 }
 
+
+
 gl_ui_buffer::gl_ui_buffer()
 {
 	buffers[0] = 0;
@@ -610,25 +625,42 @@ int gl_ui_buffer::init(size_t start_vbo_size, size_t start_ibo_size, size_t star
 	vbo_capacity = UI_BUFFER_IBO_SIZE_DEFAULT;
 
 	if (start_vbo_size)
-		ibo_capacity = (GLsizei)start_vbo_size;
+		vbo_capacity = (GLsizei)start_vbo_size;
 
 	if (start_ibo_size)
-		vbo_capacity = (GLsizei)start_ibo_size;
+		ibo_capacity = (GLsizei)start_ibo_size;
 
 	glGenBuffers(UI_BUFFERS_COUNT, buffers); //allocate buffers
 
 	/* alloc vertex buffer */
 	glBindBuffer(buffers[UI_BUFFER_VBO], GL_ARRAY_BUFFER);
-	glBufferData(GL_ARRAY_BUFFER, )
-
-
-
+	GL_CALL(glBufferData(GL_ARRAY_BUFFER, vbo_capacity * sizeof(ui_mesh_vertex_t), NULL, GL_DYNAMIC_DRAW));
 
 	/* alloc index buffer */
 	glBindBuffer(buffers[UI_BUFFER_IBO], GL_ELEMENT_ARRAY_BUFFER);
-
-
-
-
+	GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibo_capacity * sizeof(unsigned int), NULL, GL_DYNAMIC_DRAW));
 	return 0;
+}
+
+int gl_ui_buffer::shutdown()
+{
+	clear();
+	glDeleteBuffers(UI_BUFFERS_COUNT, buffers);
+	return 0;
+}
+
+void gl_ui_buffer::clear()
+{
+	indices.clear();
+	vertices.clear();
+	drawcmds.clear();
+}
+
+bool gl_ui_buffer::commit()
+{
+	if (ibo_capacity < (GLsizeiptr)indices.size());
+	//TODO: continue
+
+
+	return false;
 }

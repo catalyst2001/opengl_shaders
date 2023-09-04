@@ -10,10 +10,16 @@
 #pragma once
 #include <stdint.h>
 
-struct window_size_t {
-	int width, height;
-};
+/* BASIC HANDLE TYPES */
+typedef void *handle_t;
+typedef handle_t htex_t;
+typedef handle_t hmesh_t;
+typedef handle_t hanim_t;
+typedef handle_t hmdl_t;
+typedef handle_t hskl_t;
+typedef handle_t hshader_program_t;
 
+/* RENDER STATUS CODES */
 enum RENDER_STATUS {
 	RENDER_STATUS_OK = 0,
 	RENDER_STATUS_ERROR_OUT_OF_MEMORY,
@@ -28,6 +34,10 @@ enum RENDER_STATUS {
 };
 
 #define RENDER_UNUSED_PARAM(x)
+
+struct window_size_t {
+	int width, height;
+};
 
 /* RENDER PBR MATERIAL */
 #define RENDER_MATERIAL_HAS_DIFFUSE           (1 << 0)
@@ -56,14 +66,6 @@ struct render_material_t {
 	htex_t textures[RENDER_MATERIAL_MAP_MAX_COUNT];
 };
 RENDER_UNUSED_PARAM(sizeof(render_material_t));
-
-typedef void *handle_t;
-typedef handle_t htex_t;
-typedef handle_t hmesh_t;
-typedef handle_t hanim_t;
-typedef handle_t hmdl_t;
-typedef handle_t hskl_t;
-typedef handle_t hshader_program_t;
 
 /* MESHES */
 typedef float mat4x4[4][4];
@@ -219,11 +221,6 @@ struct texture_create_info_t {
 typedef handle_t hshader_obj_t;
 typedef handle_t hshader_prog_t;
 
-enum RENDER_SHADER_LDR_TYPE {
-	RENDER_SHADER_LDR_TYPE_FROM_FILE = 0,
-	RENDER_SHADER_LDR_TYPE_FROM_MEMORY
-};
-
 enum RENDER_SHADER_TYPE {
 	RENDER_SHADER_TYPE_VERTEX = 0,
 	RENDER_SHADER_TYPE_GEOMETRY,
@@ -317,11 +314,20 @@ public:
 
 };
 
+/* RENDER LOG CALLBACK */
+enum RENDER_LOG_MSG {
+	RENDER_LOG_MSG_NOTIFY = 0,
+	RENDER_LOG_MSG_WARNING,
+	RENDER_LOG_MSG_CRITICAL_ERROR
+};
+
+typedef void (*render_log_message_callback)(RENDER_LOG_MSG msgtype, const char *p_text);
+
 class ire_render
 {
 public:
 	/* render init/shutdown */
-	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info) = 0;
+	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info, render_log_message_callback p_log_callback) = 0;
 	virtual int shutdown() = 0;
 	virtual int render_cycle() = 0;
 

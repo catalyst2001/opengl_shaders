@@ -2,6 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="gl_utils_test.cpp" />
+    <ClCompile Include="re_logconsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="glutils">
@@ -10,5 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GL\wglext.h" />
+    <ClInclude Include="re_logconsole.h" />
+    <ClInclude Include="ire_logconsole.h" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ cwindow::cwindow()
 #if defined LINUX
 
 #else
-	WNDCLASSEXA 
+	//WNDCLASSEXA 
 #endif
 }
 
@@ -25,8 +25,9 @@ int cwindow::create(int x, int y, int width, int height)
 #if defined LINUX
 
 #else
-	h_window = CreateWindowExA(0, )
+	//h_window = CreateWindowExA(0, )
 #endif
+	return 0;
 }
 
 int cwindow::move_window(int x, int y)

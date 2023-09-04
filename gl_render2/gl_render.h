@@ -1,10 +1,17 @@
 #pragma once
+#include <vector> //TEMP USE!
 #include "ire_render.h"
 
 #define WINDOW_ID "rge_window"
 
 #define MIN_GL_VERSION 3
 #define MAJ_GL_VERSION 3
+
+#if defined(_MSC_VER) && !defined(__PRETTY_FUNCTION__)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+extern render_log_message_callback log_msg;
 
 #if defined LINUX
 #include <x11.h>
@@ -13,82 +20,106 @@
 
 #else
 #include <Windows.h>
-#include <gl/GL.h>
-#include <gl/glu.h>
-#include "GL/wglext.h"
 #include "glad/glad.h"
+#include "GL/wglext.h"
+
+#pragma comment(lib, "opengl32.lib")
 
 #define r_nprintf(b, s, f, ...) sprintf_s(b, s, f, __VA_ARGS__)
 
 #endif
 
+/* STRING FORMAT */
+const char *va(const char *p_format, ...);
+
 #if defined(GL_DEBUG_MODE) || defined(_DEBUG)
 #define GL_CALL(func)\
 	func;\
-	if(glGetError() != GL_NO_ERROR)\
-		printf("[GL_DEBUG_MODE] Call " #func " failed with error %d!\n", glGetError());
+	if(glGetError() != GL_NO_ERROR) {\
+		log_msg(RENDER_LOG_MSG_CRITICAL_ERROR, va("OpenGL Error: " __PRETTY_FUNCTION__ " Call " #func " failed with error %d!\n", glGetError())); \
+	}
+
+#define GL_CHECK(err, func) if(err != GL_NO_ERROR) { log_msg(RENDER_LOG_MSG_CRITICAL_ERROR, va("OpenGL Error: " __PRETTY_FUNCTION__ " Call " func "failed with error %d!\n", err)); }
 
 #else
-
+#define GL_CALL(func) func;
+#define GL_CHECK(err, func)
 #endif
 
-const char *va(const char *p_format, ...);
+/* LOG MACRO */
+#define LOG_NOTIFY(format, ...) log_msg(RENDER_LOG_MSG_NOTIFY, va(format, __VA_ARGS__))
+#define LOG_WARNING(format, ...) log_msg(RENDER_LOG_MSG_WARNING, va(format, __VA_ARGS__))
+#define LOG_ERROR(format, ...) log_msg(RENDER_LOG_MSG_CRITICAL_ERROR, va(format, __VA_ARGS__))
 
 /* GL BUFFERS BINDING SAVER CLASS FOR CORE PROFILE */
 template<GLint binding>
 constexpr GLint get_target_from_binding_name()
 {
-	if constexpr (binding == GL_ARRAY_BUFFER_BINDING)
+	static_assert(binding != GL_ARRAY_BUFFER_BINDING ||
+		binding != GL_PIXEL_PACK_BUFFER_BINDING ||
+		binding != GL_ELEMENT_ARRAY_BUFFER_BINDING ||
+		binding != GL_TEXTURE_BINDING_1D ||
+		binding != GL_TEXTURE_BINDING_2D ||
+		binding != GL_TEXTURE_BINDING_3D ||
+		binding != GL_TEXTURE_BINDING_CUBE_MAP, __FUNCSIG__ ": Failed to find specified binding!");
+
+	if (binding == GL_ARRAY_BUFFER_BINDING)
 		return GL_ARRAY_BUFFER;
-	
-	if constexpr (binding == GL_PIXEL_PACK_BUFFER_BINDING)
+
+	if (binding == GL_PIXEL_PACK_BUFFER_BINDING)
 		return GL_PIXEL_PACK_BUFFER;
 
-	if constexpr (binding == GL_ELEMENT_ARRAY_BUFFER_BINDING)
+	if (binding == GL_ELEMENT_ARRAY_BUFFER_BINDING)
 		return GL_ELEMENT_ARRAY_BUFFER;
 
-	if constexpr (binding == GL_TEXTURE_BINDING_1D)
+	if (binding == GL_TEXTURE_BINDING_1D)
 		return GL_TEXTURE_1D;
 
-	if constexpr (binding == GL_TEXTURE_BINDING_2D)
+	if (binding == GL_TEXTURE_BINDING_2D)
 		return GL_TEXTURE_2D;
 
-	if constexpr (binding == GL_TEXTURE_BINDING_3D)
+	if (binding == GL_TEXTURE_BINDING_3D)
 		return GL_TEXTURE_3D;
 
-	if constexpr (binding == GL_TEXTURE_BINDING_CUBE_MAP)
+	if (binding == GL_TEXTURE_BINDING_CUBE_MAP)
 		return GL_TEXTURE_CUBE_MAP;
 
-	static_assert(false, __FUNCSIG__ ": Failed to find specified binding!");
-	return 0;
+	return 0; // unreachable code. used for syntax correct
 }
 
 template<GLint target>
 constexpr GLint get_binding_name_from_target()
 {
-	if constexpr (target == GL_ARRAY_BUFFER)
+	static_assert(target != GL_ARRAY_BUFFER ||
+		target != GL_PIXEL_PACK_BUFFER ||
+		target != GL_ELEMENT_ARRAY_BUFFER ||
+		target != GL_TEXTURE_1D ||
+		target != GL_TEXTURE_2D ||
+		target != GL_TEXTURE_3D ||
+		target != GL_TEXTURE_CUBE_MAP, __FUNCSIG__ ": Failed to find specified target!");
+
+	if (target == GL_ARRAY_BUFFER)
 		return GL_ARRAY_BUFFER_BINDING;
 
-	if constexpr (target == GL_PIXEL_PACK_BUFFER)
+	if (target == GL_PIXEL_PACK_BUFFER)
 		return GL_PIXEL_PACK_BUFFER_BINDING;
 
-	if constexpr (target == GL_ELEMENT_ARRAY_BUFFER)
+	if (target == GL_ELEMENT_ARRAY_BUFFER)
 		return GL_ELEMENT_ARRAY_BUFFER_BINDING;
 
-	if constexpr (target == GL_TEXTURE_1D)
+	if (target == GL_TEXTURE_1D)
 		return GL_TEXTURE_BINDING_1D;
 
-	if constexpr (target == GL_TEXTURE_2D)
+	if (target == GL_TEXTURE_2D)
 		return GL_TEXTURE_BINDING_2D;
 
-	if constexpr (target == GL_TEXTURE_3D)
+	if (target == GL_TEXTURE_3D)
 		return GL_TEXTURE_BINDING_3D;
 
-	if constexpr (target == GL_TEXTURE_CUBE_MAP)
+	if (target == GL_TEXTURE_CUBE_MAP)
 		return GL_TEXTURE_BINDING_CUBE_MAP;
 
-	static_assert(false, __FUNCSIG__ ": Failed to find specified target!");
-	return 0;
+	return 0; // unreachable code. used for syntax correct
 }
 
 template<GLint target>
@@ -134,22 +165,157 @@ public:
 	/* commit temp vertices data to video memory */
 	bool commit();
 
+	void adjust_buffer_size();
+
 	/* push geometry */
-	void push_vertex(ui_mesh_vertex_t *p_verts, uint32_t count);
-	void push_triangle(ui_mesh_vertex_t *p_verts);
-	void push_rect(ui_mesh_vertex_t *p_verts);
+	uint32_t push_vertex(ui_mesh_vertex_t *p_verts, uint32_t count);
+	uint32_t push_triangle(ui_mesh_vertex_t *p_verts);
+	uint32_t push_rect(ui_mesh_vertex_t *p_verts);
 
 	/* update vertices */
 	bool update(uint32_t start_index, ui_mesh_vertex_t *p_vertices, uint32_t count_indices);
 };
 
-void UTIL_draw_ui_buffer(const gl_ui_buffer &ui_vertex_buffer);
+/* GL BUFFER */
+enum GL_BUFFER_STATUS {
+	GL_BUFFER_STATUS_OK = 0,
+	GL_BUFFER_STATUS_OUT_OF_MEMORY,
+	GL_BUFFER_STATUS_NOT_ALLOCATED,
+	GL_BUFFER_STATUS_COPY_ERROR,
+	GL_BUFFER_STATUS_SIZE_ERROR,
+	GL_BUFFER_STATUS_DELETE_ERROR,
+	GL_BUFFER_STATUS_MAP_ERROR,
+	GL_BUFFER_STATUS_INVALID_PARAM,
+};
 
-class gl_text_buffer
+
+template<GLenum _target, GLenum _access>
+class gl_buffer
 {
+	GLuint name;
+
+	bool buffer_alloc(GLint *p_dst_name, GLsizeiptr size, const void *p_data) {
+		GLenum error;
+		gl_buffer_binding_saver<_target> bind_save;
+		glGenBuffers(1, &name);
+		glBindBuffer(_target, name);
+		glBufferData(_target, size, p_data, _access);
+		error = glGetError();
+		GL_CHECK(error, "glBufferData")
+		return error == GL_NO_ERROR;
+	}
+
+	bool buffer_size(GLsizeiptr *p_dst, GLuint name) {
+		GLenum error;
+		gl_buffer_binding_saver<_target> target_bind_save;
+		glBindBuffer(_target, name);
+		glGetBufferParameteriv(_target, GL_BUFFER_SIZE, (GLint *)p_dst);
+		error = glGetError();
+		GL_CHECK(error, "glGetBufferParameteriv");
+		return error == GL_NO_ERROR;
+	}
+
+	bool buffer_copy_data(GLint dst_name, GLint src_name, GLint read_offs, GLint write_offs, GLint size) {		
+		/*
+		FIXME: get previous GL_COPY_WRITE_BUFFER and GL_COPY_READ_BUFFER extensions avalible on GL 4.1
+		Currently min support GL 3.3
+		*/
+		
+		GLenum error;
+		glBindBuffer(GL_COPY_WRITE_BUFFER, dst_name);
+		glBindBuffer(GL_COPY_READ_BUFFER, src_name);
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, read_offs, write_offs, size);
+		error = glGetError();
+		GL_CHECK(error, "glCopyBufferSubData")
+		return error == GL_NO_ERROR;
+	}
+
+	bool buffer_delete(GLuint name) {
+		GLenum error;
+		glDeleteBuffers(1, &name);
+		error = glGetError();
+		GL_CHECK(error, "glDeleteBuffers")
+		return error == GL_NO_ERROR;
+	}
+
+	GL_BUFFER_STATUS buffer_realloc(GLuint *p_dst_name, GLsizeiptr newsize) {
+		GLuint buffer;
+		GLuint src_copy_name = *p_dst_name;
+		GLsizeiptr curr_buffer_size;
+		GLsizeiptr new_buffer_size;
+
+		if (!buffer_size(&curr_buffer_size, src_copy_name))
+			return GL_BUFFER_STATUS_SIZE_ERROR;
+
+		/* adjust new buffer size */
+		new_buffer_size = curr_buffer_size;
+		if (newsize > curr_buffer_size)
+			new_buffer_size = newsize;
+
+		/* allocate new buffer */
+		if (!buffer_alloc(&buffer, new_buffer_size, NULL))
+			return GL_BUFFER_STATUS_OUT_OF_MEMORY;
+
+		/* copy data from old buffer to new buffer */
+		if (!buffer_copy_data(buffer, src_copy_name, 0, 0, curr_buffer_size))
+			return GL_BUFFER_STATUS_COPY_ERROR;
+
+		/* free old buffer */
+		if ((*p_dst_name) != 0 && !buffer_delete((*p_dst_name)))
+			return GL_BUFFER_STATUS_DELETE_ERROR;
+
+		*p_dst_name = buffer;
+		return GL_BUFFER_STATUS_OK;
+	}
+
 public:
+	gl_buffer() : name(0) {}
+	~gl_buffer() {}
 
+	void get_size(size_t *p_dst_size) {
+		*p_dst_size = 0;
+		GL_CALL(glGetBufferParameteriv(_target, GL_BUFFER_SIZE, (GLint *)p_dst_size))
+	}
 
+	bool is_allocated() { return name != 0; }
+
+	GL_BUFFER_STATUS alloc(const void *p_data, size_t size) {
+		/* allocate buffer */
+		return buffer_alloc(&name, (GLsizeiptr)size, p_data);
+	}
+
+	GL_BUFFER_STATUS realloc(const void *p_data, size_t size) {
+
+		/* check for last allocations */
+		if (!is_allocated())
+			return alloc(p_data, size);
+
+		/* allocate new buffer */
+		return buffer_realloc(&name, size);
+	}
+
+	GL_BUFFER_STATUS copy_to(char *p_dst, size_t dstlen) {
+		GLenum error;
+		GLsizeiptr src_size;
+		if (!buffer_size(&src_size, name))
+			return GL_BUFFER_STATUS_SIZE_ERROR;
+
+		const GLubyte *p_data = glMapBuffer(_target, GL_READ_ONLY);
+		error = glGetError();
+		if (!p_data) {
+			GL_CHECK(error, "glMapBuffer")
+			return GL_BUFFER_STATUS_MAP_ERROR;
+		}
+		memcpy_s(p_dst, dstlen, p_data, (size_t)src_size);
+		glUnmapBuffer(_target);
+		return GL_BUFFER_STATUS_OK;
+	}
+
+	GL_BUFFER_STATUS free() {
+		GL_BUFFER_STATUS status = buffer_delete(name);
+		name = 0;
+		return status;
+	}
 };
 
 /* MAIN VIDEO DEVICES QUERY INFO CLASS */
@@ -197,7 +363,7 @@ public:
 	~gl_render();
 
 	/* render init/shutdown */
-	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info);
+	virtual int init(char *p_dsterr, size_t maxlen, const re_render_init_info_t *p_init_info, render_log_message_callback p_log_callback);
 	virtual int shutdown();
 	virtual int render_cycle();
 
