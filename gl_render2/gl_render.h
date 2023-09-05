@@ -176,6 +176,25 @@ public:
 	bool update(uint32_t start_index, ui_mesh_vertex_t *p_vertices, uint32_t count_indices);
 };
 
+/* GL SHADER OBJECT */
+enum GL_SHADER_OBJECT_STATUS {
+	GL_SHADER_OBJECT_STATUS_OK = 0,
+	GL_SHADER_OBJECT_STATUS_SYNTAX_ERROR
+};
+
+GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, char *p_dst_err, size_t dst_maxlen, GLenum shader_type, const char *p_text);
+GL_SHADER_OBJECT_STATUS gl_shader_object_delete(GLuint src_object);
+
+/* GL PROGRAM OBJECT */
+enum GL_SHADER_PROGRAM_STATUS {
+	GL_SHADER_PROGRAM_STATUS_OK = 0,
+	GL_SHADER_PROGRAM_STATUS_LINK_ERROR
+};
+
+GL_SHADER_PROGRAM_STATUS gl_shader_program_create_and_link(GLuint *p_dst_object, char *p_dst_err, size_t dst_maxlen, const GLuint *p_objects, GLuint num_objects);
+GL_SHADER_PROGRAM_STATUS gl_shader_program_validate(GLuint src_object, char *p_dst_err, size_t dst_maxlen);
+GL_SHADER_PROGRAM_STATUS gl_shader_program_delete(GLuint src_object);
+
 /* GL BUFFER */
 enum GL_BUFFER_STATUS {
 	GL_BUFFER_STATUS_OK = 0,
@@ -188,17 +207,16 @@ enum GL_BUFFER_STATUS {
 	GL_BUFFER_STATUS_INVALID_PARAM,
 };
 
-
 template<GLenum _target, GLenum _access>
 class gl_buffer
 {
 	GLuint name;
 
-	bool buffer_alloc(GLint *p_dst_name, GLsizeiptr size, const void *p_data) {
+	bool buffer_alloc(GLuint *p_dst_name, GLsizeiptr size, const void *p_data) {
 		GLenum error;
 		gl_buffer_binding_saver<_target> bind_save;
-		glGenBuffers(1, &name);
-		glBindBuffer(_target, name);
+		glGenBuffers(1, p_dst_name);
+		glBindBuffer(_target, *p_dst_name);
 		glBufferData(_target, size, p_data, _access);
 		error = glGetError();
 		GL_CHECK(error, "glBufferData")
@@ -281,7 +299,10 @@ public:
 
 	GL_BUFFER_STATUS alloc(const void *p_data, size_t size) {
 		/* allocate buffer */
-		return buffer_alloc(&name, (GLsizeiptr)size, p_data);
+		if (!buffer_alloc(&name, (GLsizeiptr)size, p_data))
+			return GL_BUFFER_STATUS_OUT_OF_MEMORY;
+
+		return GL_BUFFER_STATUS_OK;
 	}
 
 	GL_BUFFER_STATUS realloc(const void *p_data, size_t size) {
@@ -338,9 +359,18 @@ class gl_render : public ire_render
 	int stencil_bits;
 	int samples;
 
+	enum GL_RENDER_VAO {
+		GL_RENDER_VAO_2D = 0,
+		GL_RENDER_VAO_3D,
+
+		GL_RENDER_NUM_VAO
+	};
+
 	/* gl resources */
-	GLint vao_2d, vao_3d;
-	GLint ui_vbo, ui_ibo;
+	GLuint vao[GL_RENDER_NUM_VAO];
+
+	gl_buffer<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ui_vbo;
+	gl_buffer<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ui_ibo;
 
 #if defined LINUX
 

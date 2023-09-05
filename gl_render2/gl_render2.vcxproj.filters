@@ -36,6 +36,9 @@
     <ClCompile Include="glad\glad.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="rabdata.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gl_render.h">
@@ -69,6 +72,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="re_container.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="rabdata.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

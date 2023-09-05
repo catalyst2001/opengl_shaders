@@ -6,6 +6,9 @@
 #include "murmurhash.h"
 #include "list.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 const char *va(const char *p_format, ...)
 {
 	static char buf[1024];
@@ -64,22 +67,24 @@ bool gl_render::create_gl_context(char *p_dst_error, size_t dstlen)
 
 #else
 	int pixelformat;
-	int curr_attrib = 0;
-	int context_attribs[128];
 	DWORD last_error;
 	HGLRC h_temp_glctx;
 	PIXELFORMATDESCRIPTOR pfd;
 
-#define push_context_attrib(name, val)\
+	int curr_attrib = 0;
+	struct context_attrib_t {
+		int id;
+		int value;
+	} context_attribs[64];
+
+#define push_context_attrib(attrib_id, val)\
 	do {\
-		context_attribs[curr_attrib++] = name;\
-		context_attribs[curr_attrib++] = val;\
+		context_attribs[curr_attrib].id = attrib_id;\
+		context_attribs[curr_attrib].value = val;\
+		curr_attrib++;\
 	} while(0);
 
-#define end_context_attribs()\
-	do {\
-		context_attribs[curr_attrib++] = context_attribs[curr_attrib] = 0;\
-	} while(0);
+#define end_context_attribs() push_context_attrib(0, 0)
 
 	h_devctx = GetDC(h_window);
 	if (!h_devctx) {
@@ -131,6 +136,7 @@ bool gl_render::create_gl_context(char *p_dst_error, size_t dstlen)
 		/* setup extended context */
 		push_context_attrib(WGL_CONTEXT_MINOR_VERSION_ARB, MIN_GL_VERSION);
 		push_context_attrib(WGL_CONTEXT_MAJOR_VERSION_ARB, MAJ_GL_VERSION);
+		push_context_attrib(WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
 
 		/* WGL_ARB_create_context_robustness */
 		if (ext_avalible("WGL_ARB_create_context_robustness")) {
@@ -144,16 +150,20 @@ bool gl_render::create_gl_context(char *p_dst_error, size_t dstlen)
 		}
 		end_context_attribs();
 
-		h_glctx = wglCreateContextAttribsARB(h_devctx, NULL, context_attribs);
+#if 1
+		printf("--- context attribs ---\n");
+		for (int i = 0; i < curr_attrib; i++)
+			printf("Attrib %d: %d %d\n", i, context_attribs[i].id, context_attribs[i].value);
+#endif
+
+		h_glctx = wglCreateContextAttribsARB(h_devctx, NULL, (const int *)context_attribs);
 		if (!h_glctx) {
 			last_error = GetLastError();
 			r_nprintf(p_dst_error, dstlen, "wglCreateContextAttribsARB for main context failed! LastError() = %d (0x%x)", last_error, last_error);
 			return false;
 		}
 
-		
-		
-		h_shared_glctx = wglCreateContextAttribsARB(h_devctx, h_glctx, context_attribs);
+		h_shared_glctx = wglCreateContextAttribsARB(h_devctx, h_glctx, (const int *)context_attribs);
 		if (!h_shared_glctx) {
 			last_error = GetLastError();
 			r_nprintf(p_dst_error, dstlen, "wglCreateContextAttribsARB for resource context failed! LastError() = %d (0x%x)", last_error, last_error);
@@ -209,7 +219,8 @@ int gl_render::init_gl_renderer(char *p_dst_error, size_t maxlen)
 	if (!gladLoadGL())
 		return RENDER_STATUS_ERROR_NEEDED_EXTENSIONS_NO_AVALIBLE;
 
-
+	/* generate vertex arrays */
+	glGenVertexArrays(GL_RENDER_NUM_VAO, vao);
 
 
 	LOG_NOTIFY("Renderer initialized");
@@ -304,7 +315,7 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 
 	get_window_size(&size);
 	glViewport(0, 0, size.width, size.height);
-
+	wflags |= RENDER_WINDOW_FLAG_RUNNING;
 #endif
 	return RENDER_STATUS_OK;
 }
@@ -325,8 +336,25 @@ int gl_render::shutdown()
 	return 0;
 }
 
+gl_buffer<GL_ARRAY_BUFFER, GL_STATIC_DRAW> vertices;
+gl_buffer<GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW> indices;
+
+#include "rabdata.h"
+
 int gl_render::render_cycle()
 {
+	glm::mat4x4 world_matrix = glm::mat4x4(1.f);
+
+#if 1
+	assert(vertices.alloc(rabbit_vertices, sizeof(rabbit_vertices)) == GL_BUFFER_STATUS_OK);
+	assert(indices.alloc(rabbit_triangles, sizeof(rabbit_triangles)) == GL_BUFFER_STATUS_OK);
+
+#endif
+
+
+#if defined(LINUX)
+
+#else
 	MSG msg;
 	while (wflags & RENDER_WINDOW_FLAG_RUNNING) {
 		if (PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -335,9 +363,12 @@ int gl_render::render_cycle()
 		}
 
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+
+		SwapBuffers(h_devctx);
 	}
 
-
+#endif
 	return 0;
 }
 
@@ -658,7 +689,7 @@ void gl_ui_buffer::clear()
 
 bool gl_ui_buffer::commit()
 {
-	if (ibo_capacity < (GLsizeiptr)indices.size());
+	if (ibo_capacity < (GLsizeiptr)indices.size()) {}
 	//TODO: continue
 
 

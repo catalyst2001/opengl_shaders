@@ -1,4 +1,7 @@
 ﻿  gl_render.cpp
-e:\github\opengl_shaders\gl_render2\gl_render.cpp(273): warning C4302: приведение типов: усечение из "LPWSTR" к "WORD"
-e:\github\opengl_shaders\gl_render2\gl_render.cpp(403): warning C4715: gl_render::ext_avalible: значение возвращается не при всех путях выполнения
+e:\github\opengl_shaders\gl_render2\gl_render.cpp(280): warning C4302: приведение типов: усечение из "LPWSTR" к "WORD"
+  main.cpp
+  Создание кода...
+e:\github\opengl_shaders\gl_render2\main.cpp(34): warning C4715: render_test: значение возвращается не при всех путях выполнения
+e:\github\opengl_shaders\gl_render2\gl_render.cpp(428): warning C4715: gl_render::ext_avalible: значение возвращается не при всех путях выполнения
   gl_render2.vcxproj -> E:\GITHUB\opengl_shaders\Debug\gl_render2.exe

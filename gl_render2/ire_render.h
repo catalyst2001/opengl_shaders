@@ -9,6 +9,7 @@
 */
 #pragma once
 #include <stdint.h>
+#include <glm/glm.hpp>
 
 /* BASIC HANDLE TYPES */
 typedef void *handle_t;
@@ -68,9 +69,6 @@ struct render_material_t {
 RENDER_UNUSED_PARAM(sizeof(render_material_t));
 
 /* MESHES */
-typedef float mat4x4[4][4];
-typedef float vec3[3];
-typedef float vec2[2];
 
 struct render_anim_frame_t {
 	mat4x4 transform;
@@ -119,16 +117,16 @@ struct mesh_draw_command_t {
 
 /* UI MESH VERTEX STRUCT */
 struct ui_mesh_vertex_t {
-	vec2 vertex;
-	vec2 texcoord;
-	vec3 color;
+	glm::vec2 vertex;
+	glm::vec2 texcoord;
+	glm::vec3 color;
 };
 
 /* NO ANIMATED MESH VERTEX STRUCT */
 struct mesh_vertex_t {
-	vec3 vertex;
-	vec3 normal;
-	vec2 texcoord;
+	glm::vec3 vertex;
+	glm::vec3 normal;
+	glm::vec2 texcoord;
 };
 RENDER_UNUSED_PARAM(sizeof(mesh_vertex_t));
 
@@ -322,6 +320,18 @@ enum RENDER_LOG_MSG {
 };
 
 typedef void (*render_log_message_callback)(RENDER_LOG_MSG msgtype, const char *p_text);
+
+class ire_window_input_callbacks
+{
+public:
+	virtual void on_mouse_move(int x, int y) = 0;
+	virtual void on_mouse_keys(int x, int y, int button, int state) = 0;
+	virtual void on_window_size(int width, int height) = 0;
+	virtual void on_key(int key, int state) = 0;
+	virtual void on_window_action() = 0;
+	virtual void on_screen_power() = 0;
+	virtual void on_printscreen() = 0;
+};
 
 class ire_render
 {
