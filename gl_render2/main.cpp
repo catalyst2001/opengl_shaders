@@ -33,6 +33,8 @@ int render_test()
 	render.shutdown();
 }
 
+class IUnityEngine;
+
 int main()
 {
 	render_test();

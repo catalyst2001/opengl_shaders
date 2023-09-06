@@ -19,6 +19,11 @@ const char *va(const char *p_format, ...)
 	return buf;
 }
 
+GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, char *p_dst_err, size_t dst_maxlen, GLenum shader_type, const char *p_text)
+{
+	return GL_SHADER_OBJECT_STATUS();
+}
+
 /* material */
 
 /* mesh instance */
@@ -26,7 +31,7 @@ struct r_mesh_instance_t {
 	int mode; //RENDER_MESH_RENDER_MODE
 	int flags; //RENDER MESH INSTANCES FLAGS
 	hmesh_t h_mesh;
-	mat4x4 transform;
+	glm::mat4x4 transform;
 };
 
 render_log_message_callback log_msg;
@@ -211,6 +216,8 @@ bool gl_render::destroy_gl_context()
 
 int gl_render::init_gl_renderer(char *p_dst_error, size_t maxlen)
 {
+	window_size_t size;
+
 	LOG_NOTIFY("Initializing context...");
 	if (!create_gl_context(p_dst_error, maxlen))
 		return RENDER_STATUS_ERROR_CREATE_CONTEXT;
@@ -222,6 +229,9 @@ int gl_render::init_gl_renderer(char *p_dst_error, size_t maxlen)
 	/* generate vertex arrays */
 	glGenVertexArrays(GL_RENDER_NUM_VAO, vao);
 
+
+	get_window_size(&size);
+	glViewport(0, 0, size.width, size.height);
 
 	LOG_NOTIFY("Renderer initialized");
 	return RENDER_STATUS_OK;
@@ -313,8 +323,6 @@ int gl_render::init(char *p_dst_error, size_t maxlen, const re_render_init_info_
 	if (status != RENDER_STATUS_OK)
 		return status;
 
-	get_window_size(&size);
-	glViewport(0, 0, size.width, size.height);
 	wflags |= RENDER_WINDOW_FLAG_RUNNING;
 #endif
 	return RENDER_STATUS_OK;
@@ -363,6 +371,29 @@ int gl_render::render_cycle()
 		}
 
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+		/* draw 3d graphics */
+		glBindVertexArray(vao[GL_RENDER_VAO_3D]);
+		{
+
+			/* draw all static meshes */
+			for (size_t i = 0; i < meshes.size(); i++) {
+				//render_mesh_t *p_mesh = meshes[i];
+				//p_mesh->
+			}
+
+			/* draw all models */
+			for (size_t i = 0; i < meshes.size(); i++) {
+
+			}
+		}
+
+		/* draw 2d graphics */
+		glBindVertexArray(vao[GL_RENDER_VAO_2D]);
+		{
+
+		}
+		
 
 
 		SwapBuffers(h_devctx);
@@ -533,7 +564,7 @@ int gl_render::model_set_base_skeleton(hmdl_t h_mdl, hskl_t h_skel)
 	return 0;
 }
 
-int gl_render::model_add_mesh_part(hmesh_t h_mesh, unsigned int offset)
+int gl_render::model_add_mesh_part(hmdl_t h_mdl, hmesh_t h_mesh, unsigned int offset)
 {
 	return 0;
 }

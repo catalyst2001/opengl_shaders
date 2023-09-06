@@ -6,10 +6,27 @@
  Date: 28.08.2023 3:10
  File: ire_render.h
  
+ TODO: ADD SORT INDEXER TO MESHES LIST!
+ 
+ struct sort_indexer_t {
+	int texture;
+	int mesh;
+
+	// all doubled data this
+
+	size_t index; //starts matched objects
+	size_t count; //count matched objects
+ };
+
 */
 #pragma once
 #include <stdint.h>
 #include <glm/glm.hpp>
+
+enum RENDER_INIT_TYPE {
+	RENDER_INIT_GL_LEGACY_COMPAT = 0,
+	RENDER_INIT_GL_CORE
+};
 
 /* BASIC HANDLE TYPES */
 typedef void *handle_t;
@@ -71,7 +88,7 @@ RENDER_UNUSED_PARAM(sizeof(render_material_t));
 /* MESHES */
 
 struct render_anim_frame_t {
-	mat4x4 transform;
+	glm::mat4x4 transform;
 };
 RENDER_UNUSED_PARAM(sizeof(render_anim_frame_t));
 
@@ -321,7 +338,7 @@ enum RENDER_LOG_MSG {
 
 typedef void (*render_log_message_callback)(RENDER_LOG_MSG msgtype, const char *p_text);
 
-class ire_window_input_callbacks
+class ire_window_callbacks
 {
 public:
 	virtual void on_mouse_move(int x, int y) = 0;
@@ -401,13 +418,20 @@ public:
 	/* model (draft 1) */
 	virtual int model_create(hmdl_t *p_dst_hmdl, const char *p_name) = 0;
 	virtual int model_set_base_skeleton(hmdl_t h_mdl, hskl_t h_skel) = 0;
-	virtual int model_add_mesh_part(hmesh_t h_mesh, unsigned int offset) = 0;
+	virtual int model_add_mesh_part(hmdl_t h_mdl, hmesh_t h_mesh, unsigned int offset) = 0;
 	virtual int model_skel_is_compatible(hmdl_t h_mdl, hskl_t h_skel) = 0;
 	virtual int model_anim_select(RENDER_ANIM_SELECT_TYPE anim_op_type, hmdl_t h_mdl, hanim_t h_anim, unsigned int start_frame, unsigned int end_frame, float blend_factor) = 0;
 	virtual int model_anim_set_blend_factor(hmdl_t h_mdl, hanim_t h_anim, float blend_factor) = 0;
 	virtual int model_anim_set_playback_speed(hmdl_t h_mdl, hanim_t h_anim, float fps) = 0;
 	virtual int model_info(model_info_t *p_dst_info, hmdl_t h_mdl) = 0;
 	virtual int model_delete(hmdl_t h_mdl) = 0;
+
+	/* draw functions */
+	virtual int draw_list_add_mesh(hmesh_t h_mesh) = 0;
+	virtual int draw_list_remove_mesh() = 0;
+	virtual int draw_list_add_model() = 0;
+	virtual int draw_list_remove_model() = 0;
+
 
 	/* WARNING: IT IS LOW PERFORMANCE METHOD! DON'T USE THIS IN EVERY FRAME!!!  */
 	int model_anim_set_bindpose_by_skel(hmdl_t h_mdl, const char *p_skelname) {

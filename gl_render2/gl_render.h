@@ -458,7 +458,7 @@ public:
 	/* model (draft 1) */
 	virtual int model_create(hmdl_t *p_dst_hmdl, const char *p_name);
 	virtual int model_set_base_skeleton(hmdl_t h_mdl, hskl_t h_skel);
-	virtual int model_add_mesh_part(hmesh_t h_mesh, unsigned int offset);
+	virtual int model_add_mesh_part(hmdl_t h_mdl, hmesh_t h_mesh, unsigned int offset);
 	virtual int model_skel_is_compatible(hmdl_t h_mdl, hskl_t h_skel);
 	virtual int model_anim_select(RENDER_ANIM_SELECT_TYPE anim_op_type, hmdl_t h_mdl, hanim_t h_anim, unsigned int start_frame, unsigned int end_frame, float blend_factor);
 	virtual int model_anim_set_blend_factor(hmdl_t h_mdl, hanim_t h_anim, float blend_factor);
