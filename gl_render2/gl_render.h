@@ -359,6 +359,9 @@ class gl_render : public ire_render
 	int stencil_bits;
 	int samples;
 
+	glm::mat4x4 ortho_proj;
+	glm::mat4x4 perspecrive_proj;
+
 	enum GL_RENDER_VAO {
 		GL_RENDER_VAO_2D = 0,
 		GL_RENDER_VAO_3D,
@@ -371,6 +374,10 @@ class gl_render : public ire_render
 
 	gl_buffer<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ui_vbo;
 	gl_buffer<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ui_ibo;
+
+	/* GPU programs */
+	GLuint default_3d_program;
+	GLuint default_2d_program;
 
 #if defined LINUX
 
@@ -385,6 +392,10 @@ class gl_render : public ire_render
 
 	bool create_gl_context(char *p_dst_error, size_t dstlen);
 	bool destroy_gl_context();
+
+
+	/* renderer */
+	int init_gl_defauls_shaders();
 
 	int init_gl_renderer(char *p_dst_error, size_t maxlen);
 
@@ -465,4 +476,10 @@ public:
 	virtual int model_anim_set_playback_speed(hmdl_t h_mdl, hanim_t h_anim, float fps);
 	virtual int model_info(model_info_t *p_dst_info, hmdl_t h_mdl);
 	virtual int model_delete(hmdl_t h_mdl);
+
+	/* draw functions */
+	virtual int draw_list_add_mesh(hmesh_t h_mesh);
+	virtual int draw_list_remove_mesh(hmesh_t h_mesh);
+	virtual int draw_list_add_model(hmdl_t h_model);
+	virtual int draw_list_remove_model(hmdl_t h_model);
 };

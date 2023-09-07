@@ -377,6 +377,7 @@ public:
 
 	virtual int set_lighting_shader(hshader_program_t h_shaderprog) = 0;
 	virtual int set_shadow_shader(hshader_program_t h_shaderprog) = 0;
+	virtual int set_postprocess_shader() = 0;
 
 	/* settings */
 	virtual int enable(int param) = 0;
@@ -428,10 +429,9 @@ public:
 
 	/* draw functions */
 	virtual int draw_list_add_mesh(hmesh_t h_mesh) = 0;
-	virtual int draw_list_remove_mesh() = 0;
-	virtual int draw_list_add_model() = 0;
-	virtual int draw_list_remove_model() = 0;
-
+	virtual int draw_list_remove_mesh(hmesh_t h_mesh) = 0;
+	virtual int draw_list_add_model(hmdl_t h_model) = 0;
+	virtual int draw_list_remove_model(hmdl_t h_model) = 0;
 
 	/* WARNING: IT IS LOW PERFORMANCE METHOD! DON'T USE THIS IN EVERY FRAME!!!  */
 	int model_anim_set_bindpose_by_skel(hmdl_t h_mdl, const char *p_skelname) {

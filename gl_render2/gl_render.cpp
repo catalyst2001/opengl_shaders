@@ -28,6 +28,7 @@ GL_SHADER_OBJECT_STATUS gl_shader_object_compile(GLuint *p_dst_object, char *p_d
 
 /* mesh instance */
 struct r_mesh_instance_t {
+	size_t mesh_index; //for fast remove from meshes list if mesh is static
 	int mode; //RENDER_MESH_RENDER_MODE
 	int flags; //RENDER MESH INSTANCES FLAGS
 	hmesh_t h_mesh;
@@ -211,6 +212,45 @@ bool gl_render::destroy_gl_context()
 	ReleaseDC(h_window, h_devctx);
 	h_devctx = NULL;
 #endif
+	return 0;
+}
+
+int gl_render::init_gl_defauls_shaders()
+{
+	char error[128];
+
+	/* default 3d shader */
+	union {
+		GLuint vertex_obj, fragment_obj;
+		GLuint objects[2];
+	};
+
+	static const char *p_vert_shader = {
+		"#version 330 core\n"
+		""
+		""
+		""
+		""
+		""
+	};
+
+	static const char *p_frag_shader = {
+		"#version 330 core\n"
+		""
+		""
+		""
+		""
+		""
+	};
+
+	gl_shader_object_compile(&vertex_obj, error, sizeof(error), GL_VERTEX_SHADER, p_vert_shader);
+	gl_shader_object_compile(&fragment_obj, error, sizeof(error), GL_FRAGMENT_SHADER, p_frag_shader);
+	gl_shader_program_create_and_link(&default_3d_program, error, sizeof(error), objects, 2);
+
+	/* default 2d shader */
+
+
+
 	return 0;
 }
 
@@ -595,6 +635,26 @@ int gl_render::model_info(model_info_t *p_dst_info, hmdl_t h_mdl)
 }
 
 int gl_render::model_delete(hmdl_t h_mdl)
+{
+	return 0;
+}
+
+int gl_render::draw_list_add_mesh(hmesh_t h_mesh)
+{
+	return 0;
+}
+
+int gl_render::draw_list_remove_mesh(hmesh_t h_mesh)
+{
+	return 0;
+}
+
+int gl_render::draw_list_add_model(hmdl_t h_model)
+{
+	return 0;
+}
+
+int gl_render::draw_list_remove_model(hmdl_t h_model)
 {
 	return 0;
 }
