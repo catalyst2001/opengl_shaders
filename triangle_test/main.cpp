@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #pragma comment(lib, "../common/glfw3/glfw3.lib")
 #pragma comment(lib, "legacy_stdio_definitions.lib")
-#include "glad.h"
+#include "../common/glad/glad.h"
 #include <Windows.h>
 #include <gl/GL.h>
 #include "../common/glfw3/GLFW/glfw3.h"

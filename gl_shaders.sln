@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl_utils_test", "gl_utils_t
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gl_render2", "gl_render2\gl_render2.vcxproj", "{BB584B5C-3575-4E5C-B3ED-CE855BA34236}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2d_triangle", "2d_triangle\2d_triangle.vcxproj", "{BE3CA94B-B90D-436A-B137-56EB343B7650}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -91,6 +93,14 @@ Global
 		{BB584B5C-3575-4E5C-B3ED-CE855BA34236}.Release|x64.Build.0 = Release|x64
 		{BB584B5C-3575-4E5C-B3ED-CE855BA34236}.Release|x86.ActiveCfg = Release|Win32
 		{BB584B5C-3575-4E5C-B3ED-CE855BA34236}.Release|x86.Build.0 = Release|Win32
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Debug|x64.ActiveCfg = Debug|x64
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Debug|x64.Build.0 = Debug|x64
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Debug|x86.Build.0 = Debug|Win32
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Release|x64.ActiveCfg = Release|x64
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Release|x64.Build.0 = Release|x64
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Release|x86.ActiveCfg = Release|Win32
+		{BE3CA94B-B90D-436A-B137-56EB343B7650}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
