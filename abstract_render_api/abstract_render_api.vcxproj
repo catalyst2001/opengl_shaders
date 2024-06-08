@@ -23,7 +23,7 @@
     <ProjectGuid>{8A677B93-08CB-42EE-ACCC-8ACA9A52EDE0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>abstractrenderapi</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

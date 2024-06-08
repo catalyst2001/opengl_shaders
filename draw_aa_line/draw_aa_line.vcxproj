@@ -23,7 +23,7 @@
     <ProjectGuid>{4F821110-AB2E-4842-804D-04B49CF4E024}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>drawaaline</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

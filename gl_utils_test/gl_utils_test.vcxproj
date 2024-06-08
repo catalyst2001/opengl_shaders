@@ -23,7 +23,7 @@
     <ProjectGuid>{8837F1E5-D477-45FB-8AF2-EB52B83647C4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>glutilstest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
